@@ -35,7 +35,7 @@ To be updated
 - branch name :- feat/branch-name or feature/branch-name
 
 **Update**
-- commit message :- update:summary-of-revision or revision/summary-of-revision
+- commit message :- update:summary-of-update or update/summary-of-update
 - branch name :- update/branch-name
 
 **Bug Fix**
@@ -55,7 +55,7 @@ To be updated
 #### Pull Requests Style Guide
 
 ##### Issue
-- QA engineer can't test phone verification because twilo not sending sms on staging
+
 
 ##### What has changed:
 
