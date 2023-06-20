@@ -1,0 +1,34 @@
+[
+  {
+    "name": "Clothing and apparels",
+    "abbreviation": "CA"
+  },
+  {
+    "name": "Footwear and Shoes",
+    "abbreviation": "FS"
+  },
+  {
+    "name": "Electronics and Gadgets",
+    "abbreviation": "EG"
+  },
+  {
+    "name": "Games and Toys",
+    "abbreviation": "GT"
+  },
+  {
+    "name": "Sports Products",
+    "abbreviation": "SP"
+  },
+  {
+    "name": "Furniture",
+    "abbreviation": "F"
+  },
+  {
+    "name": "Medical Supplies",
+    "abbreviation": "MS"
+  },
+  {
+    "name": "Toys",
+    "abbreviation": "T"
+  }
+]

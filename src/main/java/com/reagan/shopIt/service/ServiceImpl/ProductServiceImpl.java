@@ -1,6 +1,6 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
-import com.reagan.shopIt.model.domain.Product;
+import com.reagan.shopIt.model.domain.Products;
 import com.reagan.shopIt.model.dto.ProductDTO;
 import com.reagan.shopIt.model.exception.ProductNotFoundException;
 import com.reagan.shopIt.repository.ProductRepository;
@@ -22,16 +22,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDTO getProductById(Long productId) {
-        Product product = productRepository.findById(productId)
+        Products products = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found"));
-        return modelMapper.map(product, ProductDTO.class);
+        return modelMapper.map(products, ProductDTO.class);
     }
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
-        Product product = modelMapper.map(productDTO, Product.class);
-        Product savedProduct = productRepository.save(product);
-        return modelMapper.map(savedProduct, ProductDTO.class);
+        Products products = modelMapper.map(productDTO, Products.class);
+        Products savedProducts = productRepository.save(products);
+        return modelMapper.map(savedProducts, ProductDTO.class);
     }
 
     @Override

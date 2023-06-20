@@ -1,6 +1,6 @@
 package com.reagan.shopIt;
 
-import com.reagan.shopIt.model.domain.Product;
+import com.reagan.shopIt.model.domain.Products;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.CategoryDTO;
 import com.reagan.shopIt.model.dto.ProductDTO;
@@ -95,10 +95,10 @@ public class DTOTests {
         ProductDTO productDTO = new ProductDTO();
         // Set productDTO properties
 
-        Mockito.when(productRepository.save(Mockito.any(Product.class))).thenAnswer(invocation -> {
-            Product product = invocation.getArgument(0);
-            product.setId(1L); // Set a unique ID for the created product
-            return product;
+        Mockito.when(productRepository.save(Mockito.any(Products.class))).thenAnswer(invocation -> {
+            Products products = invocation.getArgument(0);
+            products.setId(1L); // Set a unique ID for the created product
+            return products;
         });
 
         // Act

@@ -1,6 +1,5 @@
 package com.reagan.shopIt.service;
 
-import com.reagan.shopIt.model.domain.Order;
 import com.reagan.shopIt.model.dto.OrderDTO;
 
 public interface OrderService {

@@ -13,15 +13,7 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
     @Override
     public boolean isValid(String phoneNumber, ConstraintValidatorContext context) {
         // Custom validation logic
-        if (phoneNumber == null) {
-            return true; // null values are considered valid
-        }
-
-        // Remove any non-digit characters
-        phoneNumber = phoneNumber.replaceAll("\\D", "");
-
-        // Check if the phone number is within the desired length range
-        int maxLength = 14;
-        return phoneNumber.length() <= maxLength;
+        return phoneNumber != null && phoneNumber.matches("[0-9]+")
+                && phoneNumber.length() > 10 && phoneNumber.length() < 15;
     }
 }

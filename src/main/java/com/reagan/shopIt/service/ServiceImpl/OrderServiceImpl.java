@@ -1,9 +1,9 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
 
-import com.reagan.shopIt.model.domain.Order;
-import com.reagan.shopIt.model.domain.OrderItem;
-import com.reagan.shopIt.model.domain.Product;
+import com.reagan.shopIt.model.domain.PendingOrder;
+import com.reagan.shopIt.model.domain.CartItem;
+import com.reagan.shopIt.model.domain.Products;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.OrderDTO;
 import com.reagan.shopIt.model.dto.ProductDTO;
@@ -39,24 +39,24 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(OrderDTO orderDTO) {
         User user = userService.getUserById(orderDTO.getUserId());
 
-        Order order = modelMapper.map(orderDTO, Order.class);
-        order.setUser(user);
+        PendingOrder pendingOrder = modelMapper.map(orderDTO, PendingOrder.class);
+        pendingOrder.setUser(user);
 
-        List<OrderItem> orderItems = orderDTO.getOrderItems().stream()
+        List<CartItem> cartItems = orderDTO.getOrderItems().stream()
                 .map(orderItemDTO -> {
                     ProductDTO productById = productService.getProductById(orderItemDTO.getProductId());
-                    Product product = modelMapper.map(productById, Product.class);
-                    OrderItem orderItem = modelMapper.map(orderItemDTO, OrderItem.class);
-                    orderItem.setProduct(product);
-                    orderItem.setOrder(order);
-                    return orderItem;
+                    Products products = modelMapper.map(productById, Products.class);
+                    CartItem cartItem = modelMapper.map(orderItemDTO, CartItem.class);
+                    cartItem.setProducts(products);
+                    cartItem.setPendingOrder(pendingOrder);
+                    return cartItem;
                 })
                 .collect(Collectors.toList());
 
-        order.setOrderItems(orderItems);
+        pendingOrder.setCartItems(cartItems);
 
-        Order savedOrder = orderRepository.save(order);
-        return modelMapper.map(savedOrder, OrderDTO.class);
+        PendingOrder savedPendingOrder = orderRepository.save(pendingOrder);
+        return modelMapper.map(savedPendingOrder, OrderDTO.class);
     }
 
     // Implement other methods from the OrderService interface
