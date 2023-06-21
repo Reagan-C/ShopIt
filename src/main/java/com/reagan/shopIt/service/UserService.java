@@ -1,7 +1,6 @@
 package com.reagan.shopIt.service;
 
 import com.reagan.shopIt.model.domain.User;
-import com.reagan.shopIt.model.dto.UserDTO;
 
 public interface UserService {
     User getUserById(Long userId);

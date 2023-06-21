@@ -1,7 +1,5 @@
 package com.reagan.shopIt.service;
 
-import com.reagan.shopIt.model.dto.ProductDTO;
-
 public interface ProductService {
     ProductDTO getProductById(Long productId);
 

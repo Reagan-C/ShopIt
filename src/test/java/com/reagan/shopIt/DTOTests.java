@@ -3,8 +3,6 @@ package com.reagan.shopIt;
 import com.reagan.shopIt.model.domain.Products;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.CategoryDTO;
-import com.reagan.shopIt.model.dto.ProductDTO;
-import com.reagan.shopIt.model.dto.UserDTO;
 import com.reagan.shopIt.repository.ProductRepository;
 import com.reagan.shopIt.repository.UserRepository;
 import com.reagan.shopIt.service.ProductService;

@@ -1,7 +1,6 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
 import com.reagan.shopIt.model.domain.User;
-import com.reagan.shopIt.model.dto.UserDTO;
 import com.reagan.shopIt.model.exception.UserAlreadyExistsException;
 import com.reagan.shopIt.model.exception.UserNotFoundException;
 import com.reagan.shopIt.repository.UserRepository;

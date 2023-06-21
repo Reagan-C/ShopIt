@@ -1,7 +1,6 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
 import com.reagan.shopIt.model.domain.Products;
-import com.reagan.shopIt.model.dto.ProductDTO;
 import com.reagan.shopIt.model.exception.ProductNotFoundException;
 import com.reagan.shopIt.repository.ProductRepository;
 import com.reagan.shopIt.service.ProductService;

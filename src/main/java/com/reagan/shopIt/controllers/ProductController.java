@@ -1,6 +1,5 @@
 package com.reagan.shopIt.controllers;
 
-import com.reagan.shopIt.model.dto.ProductDTO;
 import com.reagan.shopIt.service.ProductService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -6,7 +6,6 @@ import com.reagan.shopIt.model.domain.CartItem;
 import com.reagan.shopIt.model.domain.Products;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.OrderDTO;
-import com.reagan.shopIt.model.dto.ProductDTO;
 import com.reagan.shopIt.repository.OrderRepository;
 import com.reagan.shopIt.service.OrderService;
 import com.reagan.shopIt.service.ProductService;
