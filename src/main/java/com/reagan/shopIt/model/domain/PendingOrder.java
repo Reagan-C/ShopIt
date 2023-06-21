@@ -4,6 +4,8 @@ import lombok.*;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.*;
 
@@ -12,34 +14,24 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table
+@Table(name = "pending_order")
 public class PendingOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "pending_order_cart_items",
-            joinColumns = @JoinColumn(
-                    name = "pending_order_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "cart_items_id", referencedColumnName = "id")
-    )
-    Set<CartItem> cartItems = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL,fetch =  FetchType.EAGER)
+    @JoinColumn(name = "item_id")
+    private CartItem item;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on", updatable = false, nullable = false)
     private Date createdOn;
-
-    void addPendingOrder (CartItem item) {
-        this.getCartItems().add(item);
-    }
 
 }
 

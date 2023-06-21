@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -16,33 +17,29 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table
+@Table(name = "fulfilled_orders")
 public class FulfilledOrders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "pending_order_cart_items",
-            joinColumns = @JoinColumn(
-                    name = "pending_order_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "cart_items_id", referencedColumnName = "id")
-    )
-    Set<PendingOrder> fulfilledOrders = new HashSet<>();
+    @OneToOne(cascade = CascadeType.ALL,fetch =  FetchType.EAGER)
+    @JoinColumn(name = "orders_id")
+    private PendingOrder orders;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on", updatable = false, nullable = false)
     private Date createdOn;
 
-    void addFulfilledOrder (PendingOrder item) {
-        this.fulfilledOrders.add(item);
-        System.out.println("Order Fulfilled");
-    }
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_on", nullable = false)
+    private Date updatedOn;
+
+
 }

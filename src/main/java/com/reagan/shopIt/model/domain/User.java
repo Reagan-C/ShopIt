@@ -11,7 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,10 +22,10 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username", unique = true, nullable = false)
+    @Column(name = "username",nullable = false)
     private String username;
 
-    @Column(name = "email", unique = true, nullable = false)
+    @Column(name = "email", nullable = false)
     private String emailAddress;
 
     @Column(name = "password", nullable = false)
@@ -56,31 +56,17 @@ public class User {
     private String state;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "nationality_id")
-    private Country nationality;
+    @JoinColumn(name = "country_id")
+    private Country country;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_item_id")
-    private Set<CartItem> cartItems = new HashSet<>();
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_items_id")
+    private CartItem cartItems;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_pending_orders",
-            joinColumns = @JoinColumn(
-                    name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "pending_order_id", referencedColumnName = "id")
-    )
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<PendingOrder> pendingOrders = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "user_fulfilled_orders",
-            joinColumns = @JoinColumn(
-                    name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "fulfilled_order_id", referencedColumnName = "id")
-    )
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<FulfilledOrders> fulfilledOrders = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -89,7 +75,7 @@ public class User {
             joinColumns = @JoinColumn(
                     name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(
-                    name = "user_role_id", referencedColumnName = "id")
+                    name = "roles_id", referencedColumnName = "id")
     )
     private Set<UserRole> roles = new HashSet<>();
 
@@ -118,8 +104,8 @@ public class User {
         this.getFulfilledOrders().add(fulfilledOrder);
     }
 
-    public void addCartItem(CartItem cartItem) {
-        this.getCartItems().add(cartItem);
-    }
+//    public void addCartItem(CartItem cartItem) {
+//        this.getCartItems().add(cartItem);
+//    }
 }
 

@@ -34,9 +34,9 @@ public class Products {
     @Column(nullable = false)
     private Long quantity;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
-    private Set<Category> category = new HashSet<>();
+    private Category category;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -48,9 +48,6 @@ public class Products {
     @Column(name = "updated_on", nullable = false)
     private Date updatedOn;
 
-    void addCategory (Category category1) {
-        this.category.add(category1);
-    }
 }
 
 

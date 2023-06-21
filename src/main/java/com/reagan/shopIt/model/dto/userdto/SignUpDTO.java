@@ -66,6 +66,7 @@ public class SignUpDTO implements Serializable {
     @JsonProperty("date_of_birth")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotBlank(message = "{user.dateOfBirth.notBlank}")
     @DateOfBirth
     private Date dateOfBirth = new Date();
 

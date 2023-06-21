@@ -1,4 +1,4 @@
-package com.reagan.shopIt.model.dto.userdto;
+package com.reagan.shopIt.model.dto.onetimepassword;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.reagan.shopIt.model.domain.User;

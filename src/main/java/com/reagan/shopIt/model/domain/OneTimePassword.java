@@ -19,7 +19,7 @@ public class OneTimePassword {
     @Column(name = "otp", nullable = false)
     private String otp;
 
-    @JoinColumn(name = "user_id")
+    @Column(name = "user")
     private User user;
 
     @Override

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,24 +21,13 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "products_id")
+    private Products products;
 
-    @Column(name = "price", nullable = false)
-    private double price;
-
-    @ManyToMany
-    @JoinTable(
-            name = "cart_item_products",
-            joinColumns = @JoinColumn(
-                    name = "cart_item_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "products_id", referencedColumnName = "id")
-    )
-    private Set<Products> products = new HashSet<>();
-
-    void getCart(Products product) {
-        this.getProducts().add(product);
-    }
+    @JdbcTypeCode(SqlTypes.JSON)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
 }
