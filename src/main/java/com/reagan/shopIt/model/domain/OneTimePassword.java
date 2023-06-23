@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "otp")
+@Table(name = "one_time_password")
 public class OneTimePassword {
 
     @Id
@@ -19,7 +19,8 @@ public class OneTimePassword {
     @Column(name = "otp", nullable = false)
     private String otp;
 
-    @Column(name = "user")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Override

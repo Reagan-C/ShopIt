@@ -19,6 +19,12 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Set<User> user = new HashSet<>();
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "admin_id")
+    private Set<User> users = new HashSet<>();
 
+    public String addAdmin(User newAdmin) {
+        this.getUsers().add(newAdmin);
+        return newAdmin.getEmailAddress() + " added to administrators";
+    }
 }

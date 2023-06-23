@@ -22,14 +22,11 @@ public class Country {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "title", unique = true, nullable = false)
+    @Column(name = "title",  nullable = false)
     private String title;
 
-    @Column(name = "abbreviation",unique = true, nullable = false)
+    @Column(name = "abbreviation", nullable = false)
     private String abbreviation;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "country", cascade = CascadeType.ALL)
-    private Set<User> users = new HashSet<>();
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)

@@ -8,13 +8,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.util.*;
 
 @Entity
-@Table(name = "products")
+@Table(name = "items")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Products {
+public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

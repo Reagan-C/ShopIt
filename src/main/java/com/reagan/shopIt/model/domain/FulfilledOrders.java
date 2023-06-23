@@ -27,9 +27,9 @@ public class FulfilledOrders {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL,fetch =  FetchType.EAGER)
-    @JoinColumn(name = "orders_id")
-    private PendingOrder orders;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "fulfilled_orders_id")
+    private Set<PendingOrder> orders = new HashSet<>();
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -40,6 +40,10 @@ public class FulfilledOrders {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "updated_on", nullable = false)
     private Date updatedOn;
+
+    public void addFulfilledOrder(PendingOrder order) {
+        orders.add(order);
+    }
 
 
 }

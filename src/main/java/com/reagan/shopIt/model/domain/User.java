@@ -22,13 +22,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "username",nullable = false)
+    @Column(name = "username")
     private String username;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email")
     private String emailAddress;
 
-    @Column(name = "password", nullable = false)
+    @Column(name = "password")
     private String password;
 
     @Column(name = "first_name")
@@ -43,7 +43,7 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name ="city", nullable = false)
+    @Column(name ="city")
     private String city;
 
     @Temporal(TemporalType.DATE)
@@ -55,18 +55,18 @@ public class User {
     @Column(name ="state")
     private String state;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_items_id")
-    private CartItem cartItems;
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "cart_id")
+    private Cart cart;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<PendingOrder> pendingOrders = new HashSet<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<FulfilledOrders> fulfilledOrders = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -104,8 +104,5 @@ public class User {
         this.getFulfilledOrders().add(fulfilledOrder);
     }
 
-//    public void addCartItem(CartItem cartItem) {
-//        this.getCartItems().add(cartItem);
-//    }
 }
 

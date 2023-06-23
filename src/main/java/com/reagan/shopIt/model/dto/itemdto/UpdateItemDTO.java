@@ -1,23 +1,20 @@
-package com.reagan.shopIt.model.dto.productdto;
+package com.reagan.shopIt.model.dto.itemdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.reagan.shopIt.model.domain.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.io.Serializable;
-
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
+@Getter
 @Builder
-public class AddProductDTO implements Serializable {
+public class UpdateItemDTO {
 
     @JsonProperty("name")
     @NotBlank(message = "{product.name.notBlank}")
-    private String name;
+    private String itemName;
 
     @JsonProperty("description")
     @NotBlank(message = "{product.description.notBlank}")
@@ -28,16 +25,8 @@ public class AddProductDTO implements Serializable {
     @NotBlank(message = "{product.price.notBlank}")
     private double price;
 
-    @JsonProperty("picture")
-    @NotBlank(message = "{product.picture.notBlank}")
-    private String picture;
-
     @JsonProperty("quantity")
     @NotBlank(message = "{product.quantity.notBlank}")
     private Long quantity;
-
-    @JsonProperty("category")
-    @NotBlank(message = "{product.category.notBlank}")
-    private Category category;
 
 }

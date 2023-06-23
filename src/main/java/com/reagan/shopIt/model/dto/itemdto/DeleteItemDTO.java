@@ -1,4 +1,4 @@
-package com.reagan.shopIt.model.dto.productdto;
+package com.reagan.shopIt.model.dto.itemdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
@@ -11,10 +11,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DeleteProductDTO implements Serializable {
+public class DeleteItemDTO implements Serializable {
 
     @JsonProperty("name")
     @NotBlank(message = "{product.name.notBlank}")
-    private String name;
+    private String itemName;
 
 }

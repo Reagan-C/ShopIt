@@ -2,8 +2,8 @@
 //
 //
 //import com.reagan.shopIt.model.domain.PendingOrder;
-//import com.reagan.shopIt.model.domain.CartItem;
-//import com.reagan.shopIt.model.domain.Products;
+//import com.reagan.shopIt.model.domain.Cart;
+//import com.reagan.shopIt.model.domain.Item;
 //import com.reagan.shopIt.model.domain.User;
 //import com.reagan.shopIt.repository.OrderRepository;
 //import com.reagan.shopIt.service.OrderService;
@@ -40,12 +40,12 @@
 ////        PendingOrder pendingOrder = modelMapper.map(orderDTO, PendingOrder.class);
 ////        pendingOrder.setUser(user);
 ////
-////        List<CartItem> cartItems = orderDTO.getOrderItems().stream()
+////        List<Cart> cartItems = orderDTO.getOrderItems().stream()
 ////                .map(orderItemDTO -> {
 ////                    ProductDTO productById = productService.getProductById(orderItemDTO.getProductId());
-////                    Products products = modelMapper.map(productById, Products.class);
-////                    CartItem cartItem = modelMapper.map(orderItemDTO, CartItem.class);
-////                    cartItem.setProducts(products);
+////                    Item products = modelMapper.map(productById, Item.class);
+////                    Cart cartItem = modelMapper.map(orderItemDTO, Cart.class);
+////                    cartItem.setItem(products);
 ////                    cartItem.setPendingOrder(pendingOrder);
 ////                    return cartItem;
 ////                })

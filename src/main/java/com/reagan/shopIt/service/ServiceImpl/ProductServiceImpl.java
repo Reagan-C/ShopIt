@@ -1,6 +1,6 @@
 //package com.reagan.shopIt.service.ServiceImpl;
 //
-//import com.reagan.shopIt.model.domain.Products;
+//import com.reagan.shopIt.model.domain.Item;
 //import com.reagan.shopIt.model.exception.ProductNotFoundException;
 //import com.reagan.shopIt.repository.ProductRepository;
 //import com.reagan.shopIt.service.ProductService;
@@ -21,15 +21,15 @@
 //
 //    @Override
 //    public ProductDTO getProductById(Long productId) {
-//        Products products = productRepository.findById(productId)
+//        Item products = productRepository.findById(productId)
 //                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
 //        return modelMapper.map(products, ProductDTO.class);
 //    }
 //
 //    @Override
 //    public ProductDTO createProduct(ProductDTO productDTO) {
-//        Products products = modelMapper.map(productDTO, Products.class);
-//        Products savedProducts = productRepository.save(products);
+//        Item products = modelMapper.map(productDTO, Item.class);
+//        Item savedProducts = productRepository.save(products);
 //        return modelMapper.map(savedProducts, ProductDTO.class);
 //    }
 //

@@ -5,7 +5,7 @@ public enum CategoryType {
     FOOTWEAR_AND_SHOES("Footwear and Shoes"),
     ELECTRONICS_AND_GADGETS("Electronics and Gadgets"),
     GAMES_AND_TOYS("Games and Toys"),
-    SPORTS_PRODUCTS("Sports Products"),
+    SPORTS_PRODUCTS("Sports Item"),
     FURNITURE("Furniture"),
     TOYS("Toys"),
     MEDICAL_SUPPLIES("Medical Supplies");

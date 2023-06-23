@@ -1,6 +1,6 @@
 package com.reagan.shopIt.model.exception;
 
-public class EmailExistsException extends RuntimeException{
+public class EmailExistsException extends ShopItException{
     private static final long serialVersionUID = 1L;
     public static final String ENTITY_NAME = "User";
 

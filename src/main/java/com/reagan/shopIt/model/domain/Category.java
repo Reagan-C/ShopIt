@@ -20,10 +20,10 @@ public class Category {
     @Column(name = "category_name", nullable = false)
     private String name;
 
-    @Column(name = "abbreviaton", nullable = false, unique = true)
+    @Column(name = "abbreviation", nullable = false)
     private String abbreviation;
 
-    @OneToMany(mappedBy = "category")
-    private Set<Products> products = new HashSet<>();
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private Set<Item> items = new HashSet<>();
 }
 

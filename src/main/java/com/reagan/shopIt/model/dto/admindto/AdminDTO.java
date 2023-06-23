@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public class AdminDTO {
 
-    @JsonProperty("user")
-    @NotBlank(message = "{admin.user.notBlank}")
-    private User user;
+    @JsonProperty("email")
+    @NotBlank(message = "{user.email.valid}")
+    private String UserEmailAddress;
 }
