@@ -43,6 +43,9 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "confirmed")
+    private Boolean confirmed;
+
     @Column(name ="city")
     private String city;
 

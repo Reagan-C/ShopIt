@@ -1,5 +1,4 @@
- create database if not exists `shopIt`
- ;
+
 
  create table IF NOT EXISTS `admin` (
         `id` bigint not null auto_increment,
@@ -55,9 +54,11 @@
     );
 
 
-    create table IF NOT EXISTS `otp` (
+    create table IF NOT EXISTS `auth_token` (
         `id` bigint not null auto_increment,
-        `otp` varchar(255) not null,
+        `token` varchar(255) not null,
+        `created_on` datetime(6) not null,
+        `modified_on` datetime(6),
         `user_id` bigint,
         primary key (`id`)
     );
@@ -95,6 +96,7 @@
         `last_name` varchar(255),
         `password` varchar(255),
         `phone_number` varchar(255),
+        `confirmed` BOOLEAN not null DEFAULT FALSE,
         `state` varchar(255),
         `updated_on` datetime(6) not null,
         `username` varchar(255),
