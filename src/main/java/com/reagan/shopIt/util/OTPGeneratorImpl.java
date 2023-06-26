@@ -1,7 +1,10 @@
 package com.reagan.shopIt.util;
 
+import org.springframework.stereotype.Component;
+
 import java.util.UUID;
 
+@Component
 public class OTPGeneratorImpl implements OTPGenerator{
 
     @Override

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -20,12 +21,14 @@ public class AuthToken {
     @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "created_on", nullable = false)
-    private LocalDate createdAt;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "modified_on")
-    private LocalDate confirmedAt;
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
 
+    @Column(name = "expires_at")
+    private LocalDateTime expiresAt;
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;

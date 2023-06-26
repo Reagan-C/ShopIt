@@ -38,8 +38,8 @@ public class FulfilledOrders {
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_on", nullable = false)
-    private Date updatedOn;
+    @Column(name = "fulfilled_on", nullable = false)
+    private Date fulfilledOn;
 
     public void addFulfilledOrder(PendingOrder order) {
         orders.add(order);

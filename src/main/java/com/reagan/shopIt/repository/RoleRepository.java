@@ -6,10 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RoleRepository extends JpaRepository<UserRole, Long> {
 
     @Query(value = "select i from UserRole i", nativeQuery = true)
     List<UserRole> getAllRoles();
+
+    Optional<UserRole> findByTitleAndCode(String title, String code);
+
+    UserRole findByTitle(String title);
 }

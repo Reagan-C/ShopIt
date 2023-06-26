@@ -12,8 +12,12 @@ public interface EmailService {
     @Async
     void sendChangePasswordMail(String email, String otp);
 
+    @Async
     void sendOrderTrackingMail(String email, String orderTrackingCode);
 
+    @Async
     void sendOrderDeliveryMail(String email, String orderTrackingCode);
+
+    String buildEmail(String name, String link);
 
 }

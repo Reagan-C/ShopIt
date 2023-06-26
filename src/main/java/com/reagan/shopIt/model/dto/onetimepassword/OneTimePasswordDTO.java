@@ -14,6 +14,6 @@ public class OneTimePasswordDTO {
 
     @JsonProperty("otp")
     @NotBlank(message = "Please enter otp")
-    private String otp;
+    private String token;
 
 }
