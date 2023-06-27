@@ -39,13 +39,16 @@ public interface UserService {
     @Transactional
     void addItemToCart(AddCartItemsDTO itemName);
 
-    ResponseEntity<String> placeOrder(OrderCartItemsDTO cartItems);
-
     @Transactional
     void RemoveItemFromCart(OrderCartItemsDTO itemName);
 
-    ResponseEntity<String> confirmOrderReception(OneTimePasswordDTO token);
+    ResponseEntity<String> placeOrder(String emailAddress);
+
+    ResponseEntity<String> confirmOrderReceptionMail(EmailAddressDTO email);
+
+    String confirmOrder (ConfirmOrderDTO orderDTO);
 
     Set<CartItem> viewItemsInCart(String emailAddress);
+
 
 }

@@ -107,5 +107,8 @@ public class User {
         this.getFulfilledOrders().add(fulfilledOrder);
     }
 
+    public void resetUserCart() {
+        this.cart = new Cart();
+    }
 }
 

@@ -1,6 +1,7 @@
 package com.reagan.shopIt.repository;
 
 import com.reagan.shopIt.model.domain.PendingOrder;
+import com.reagan.shopIt.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +18,6 @@ public interface PendingOrderRepository extends JpaRepository<PendingOrder, Long
 
     @Query(value = "select i from PendingOrder i", nativeQuery = true)
     List<PendingOrder> getAllOrders();
+
+    PendingOrder findByUser(User user);
 }

@@ -59,4 +59,8 @@ public class Cart {
         }
         return "Item not found in cart";
     }
+
+    public void resetCart() {
+        this.cartItems = new HashSet<>();
+    }
 }
