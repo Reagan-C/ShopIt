@@ -27,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User updateUser(String firstName, String lastName, String address, String city, String state, Country country,
                     String phoneNumber, String emailAddress);
 
-    @Query(value = "select i from User i", nativeQuery = true)
+    @Query(value = "select u from User u order by u.id desc", nativeQuery = true)
     List<User> getAllUsers();
 }
 

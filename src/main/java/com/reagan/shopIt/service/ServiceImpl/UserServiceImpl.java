@@ -1,9 +1,9 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
 import com.reagan.shopIt.config.security.jwt.JwtTokenProvider;
-import com.reagan.shopIt.model.domain.AuthToken;
-import com.reagan.shopIt.model.domain.Country;
-import com.reagan.shopIt.model.domain.User;
+import com.reagan.shopIt.model.domain.*;
+import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
+import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.onetimepassword.OneTimePasswordDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import com.reagan.shopIt.model.enums.UserRoleType;
@@ -15,7 +15,6 @@ import com.reagan.shopIt.util.OTPGenerator;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +25,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -63,10 +63,12 @@ public class UserServiceImpl implements UserService {
 
     private final CountryRepository countryRepository;
 
+    private final ItemRepository itemRepository;
+
     @Autowired
     public UserServiceImpl(UserRepository userRepository, FulfilledOrderRepository fulfilledOrderRepository,
                            PendingOrderRepository pendingOrderRepository, OTPRepository otpRepository,
-                           RoleRepository roleRepository, OTPGenerator generator, CountryRepository countryRepository) {
+                           RoleRepository roleRepository, OTPGenerator generator, CountryRepository countryRepository, ItemRepository itemRepository) {
         this.userRepository = userRepository;
         this.fulfilledOrderRepository = fulfilledOrderRepository;
         this.pendingOrderRepository = pendingOrderRepository;
@@ -74,6 +76,7 @@ public class UserServiceImpl implements UserService {
         this.roleRepository = roleRepository;
         this.generator = generator;
         this.countryRepository = countryRepository;
+        this.itemRepository = itemRepository;
     }
 
     @Override
@@ -189,6 +192,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public ResponseEntity<String> changePassword(ResetPasswordDTO resetPasswordDTO) {
 
         User existingUser = userRepository.findByEmailAddress(resetPasswordDTO.getEmailAddress());
@@ -236,6 +240,88 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok("Hello " + user.getFirstName() + ", Your update operation is successful");
     }
 
+    @Override
+    public ResponseEntity<User> findUserByEmail(String emailAddress) {
+         User user = userRepository.findByEmailAddress(emailAddress);
+         if (user == null) {
+             throw new UserNameNotFoundException(emailAddress);
+         }
+         return ResponseEntity.ok(user);
+    }
 
+    @Override
+    public List<User> findAllUsers() {
+        List<User> allUsers = userRepository.getAllUsers();
+        if (allUsers.isEmpty()) {
+            throw new RuntimeException("No user saved yet");
+        }
+        return allUsers;
+    }
 
+    @Override
+    public void addItemToCart(AddCartItemsDTO addCartItemsDTO) {
+        //first check if user exists
+        User user = userRepository.findByEmailAddress(addCartItemsDTO.getEmailAddress());
+        if (user == null) {
+            throw new UserNameNotFoundException(addCartItemsDTO.getEmailAddress());
+        }
+        // then check if item exists by that name
+        Item item = itemRepository.findByName(addCartItemsDTO.getItemName());
+        if (item == null) {
+            throw  new ItemNotFoundException(addCartItemsDTO.getItemName());
+        }
+
+        Cart cart = user.getCart();
+        if (cart == null) {
+            Cart newCart = new Cart();
+            newCart.addItem(item);
+        } else {
+            cart.addItem(item);
+        }
+        itemRepository.save(item);
+    }
+
+    @Override
+    public void RemoveItemFromCart(OrderCartItemsDTO removeItemDTO) {
+        //check if user is valid
+        User newUser = userRepository.findByEmailAddress(removeItemDTO.getEmailAddress());
+        if (newUser == null) {
+            throw new UserNameNotFoundException(removeItemDTO.getEmailAddress());
+        }
+        //check if item exists with that name
+        Item newItem = itemRepository.findByName(removeItemDTO.getName());
+        if (newItem == null) {
+            throw new ItemNotFoundException(removeItemDTO.getName());
+        }
+        // check if user cart exists
+        Cart cart = newUser.getCart();
+        if (cart == null) {
+            throw new IllegalArgumentException("Cart is empty, Please add items to cart first");
+        }
+        cart.removeItem(newItem);
+        itemRepository.save(newItem);
+    }
+
+    @Override
+    public Set<CartItem> viewItemsInCart(String emailAddress) {
+        User user = userRepository.findByEmailAddress(emailAddress);
+        if (user == null) {
+            throw new UserNameNotFoundException(emailAddress);
+        }
+        Cart userCart = user.getCart();
+        if (userCart == null) {
+            throw new IllegalArgumentException("Cart is empty at the moment");
+        }
+        return userCart.getCartItems();
+    }
+
+    @Override
+    public ResponseEntity<String> placeOrder(OrderCartItemsDTO cartItems) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<String> confirmOrderReception(OneTimePasswordDTO token) {
+        return null;
+    }
 }
