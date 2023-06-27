@@ -3,11 +3,16 @@ package com.reagan.shopIt.config.security.jwt;
 import com.reagan.shopIt.model.exception.JwtAuthenticationException;
 import com.reagan.shopIt.util.JwtConfig;
 import io.jsonwebtoken.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -19,22 +24,24 @@ public class JwtTokenProvider implements Serializable {
 
     private final JwtConfig jwtConfig;
 
+    private final UserDetailsService userDetailsService;
+
     @Autowired
-    public JwtTokenProvider(JwtConfig jwtConfig) {
+    public JwtTokenProvider(JwtConfig jwtConfig, UserDetailsService userDetailsService) {
         this.jwtConfig = jwtConfig;
+        this.userDetailsService = userDetailsService;
     }
 
-    public String generateJwtToken(Authentication authentication) {
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    public String generateJwtToken(String emailAddress) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(emailAddress);
         Date now = new Date(System.currentTimeMillis());
-        Date expiryDate = new Date(System.currentTimeMillis() + jwtConfig.getExpiration() *1000);
+        Date expiryDate = new Date(System.currentTimeMillis() + jwtConfig.getExpiration() * 1000);
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("Username", userDetails.getUsername());
-        claims.put("Roles", userDetails.getAuthorities());
+//        Map<String, Object> claims = new HashMap<>();
+//        claims.put("Username", userDetails.getUsername());
+//        claims.put("Roles", userDetails.getAuthorities());
 
         return Jwts.builder()
-                .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
@@ -68,4 +75,26 @@ public class JwtTokenProvider implements Serializable {
                 .getBody()
                 .getSubject();
     }
+
+    public String getJwtFromCookies(HttpServletRequest request) {
+        Cookie cookie = WebUtils.getCookie(request, jwtConfig.getCookieName());
+        if (cookie != null) {
+            return cookie.getValue();
+        } else {
+            return null;
+        }
+    }
+
+    public ResponseCookie generateJwtCookie(UserDetails userDetails) {
+        String jwt = generateJwtToken(userDetails.getUsername());
+        ResponseCookie cookie;
+        cookie = ResponseCookie.from(jwtConfig.getCookieName(), jwt).path("/api").maxAge(jwtConfig.getTokenValidity()
+        ).httpOnly(true).build();
+        return cookie;
+    }
+
+    public ResponseCookie getCleanJwtCookie() {
+        return ResponseCookie.from(jwtConfig.getCookieName(), null).path("/api").build();
+    }
+
 }

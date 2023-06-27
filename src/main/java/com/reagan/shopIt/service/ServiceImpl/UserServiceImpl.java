@@ -1,15 +1,13 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
+import com.reagan.shopIt.config.security.jwt.JwtTokenProvider;
 import com.reagan.shopIt.model.domain.AuthToken;
 import com.reagan.shopIt.model.domain.Country;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.onetimepassword.OneTimePasswordDTO;
-import com.reagan.shopIt.model.dto.userdto.SignUpDTO;
+import com.reagan.shopIt.model.dto.userdto.*;
 import com.reagan.shopIt.model.enums.UserRoleType;
-import com.reagan.shopIt.model.exception.ConfirmedOtpException;
-import com.reagan.shopIt.model.exception.ExpiredOtpException;
-import com.reagan.shopIt.model.exception.InvalidOtpException;
-import com.reagan.shopIt.model.exception.UserAlreadyExistsException;
+import com.reagan.shopIt.model.exception.*;
 import com.reagan.shopIt.repository.*;
 import com.reagan.shopIt.service.EmailService;
 import com.reagan.shopIt.service.UserService;
@@ -17,10 +15,18 @@ import com.reagan.shopIt.util.OTPGenerator;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 
 @Service
@@ -30,22 +36,32 @@ public class UserServiceImpl implements UserService {
     private EmailService emailService;
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     private ModelMapper mapper;
-    private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    private final UserRepository userRepository;
 
     private FulfilledOrderRepository fulfilledOrderRepository;
 
     private PendingOrderRepository pendingOrderRepository;
 
-    private OTPRepository otpRepository;
+    private final OTPRepository otpRepository;
 
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    private  OTPGenerator generator;
+    private final OTPGenerator generator;
 
-    private  CountryRepository countryRepository;
+    private final CountryRepository countryRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, FulfilledOrderRepository fulfilledOrderRepository,
@@ -77,7 +93,7 @@ public class UserServiceImpl implements UserService {
         if (country != null) {
             newUser.setCountry(country);
         } else {
-            throw new IllegalStateException("Country doesnt exist by this title");
+            throw new IllegalStateException("Country doesn't exist by this title");
         }
 
         //Generate and save confirmation token
@@ -101,11 +117,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> confirmToken(OneTimePasswordDTO token) {
+    public ResponseEntity<String> confirmSignUpToken(OneTimePasswordDTO token) {
         User user1;
 
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(token)
+        AuthToken confirmationToken = otpRepository.findByToken(token.toString())
                 .orElseThrow(InvalidOtpException::new);
 
         //check if token is confirmed
@@ -132,4 +148,94 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok("Account has been confirmed, Please visit site to log in!!!");
 
     }
+
+    @Override
+    public ResponseEntity<String> authenticate(SignInDTO body) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getEmailAddress(),
+                    body.getPassword()));
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Username or Password incorrect");
+        }
+        UserDetails userDetails = userDetailsService.loadUserByUsername(body.getEmailAddress());
+        ResponseCookie cookie = tokenProvider.generateJwtCookie(userDetails);
+
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Login Successful");
+    }
+
+    @Override
+    public ResponseEntity<?> signOut() {
+        ResponseCookie cookie = tokenProvider.getCleanJwtCookie();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(
+                "You have been signed out"
+        );
+    }
+
+
+    @Override
+    public String sendChangePasswordOtp(ForgotPasswordDTO email) {
+        User user2 = userRepository.findByEmailAddress(email.getEmailAddress());
+        if (user2 != null) {
+            String token = generator.createPasswordResetToken();
+            AuthToken authToken = new AuthToken();
+            authToken.setToken(token);
+            authToken.setCreatedAt(LocalDateTime.now());
+            authToken.setExpiresAt(LocalDateTime.now().plusMinutes(20));
+            authToken.setUser(user2);
+            otpRepository.save(authToken);
+            emailService.sendChangePasswordMail(email.getEmailAddress(), token);
+        }
+        return "Please check your Email for otp";
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(ResetPasswordDTO resetPasswordDTO) {
+
+        User existingUser = userRepository.findByEmailAddress(resetPasswordDTO.getEmailAddress());
+        //check if user exists
+        if (existingUser == null) {
+            throw new UserNameNotFoundException(resetPasswordDTO.getEmailAddress());
+        }
+        // check if new password is same as existing password
+        if (existingUser.getPassword().equals(passwordEncoder.encode(resetPasswordDTO.getPassword()))) {
+            throw new IllegalArgumentException("New password cannot be same with old password");
+        }
+        //check if token exists
+        AuthToken confirmationToken = otpRepository.findByToken(resetPasswordDTO.getOtp().toString())
+                .orElseThrow(InvalidOtpException::new);
+
+        //check if token is already confirmed
+        if (confirmationToken.getConfirmedAt() != null) {
+            throw new ConfirmedOtpException();
+        }
+        //check if token has expired
+        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new ExpiredOtpException();
+        }
+        //if token is valid, set confirmed at.
+        confirmationToken.setConfirmedAt(LocalDateTime.now());
+        //set new existing user password
+        existingUser.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
+        //send email to user
+        emailService.sendSuccessfulPasswordChangeMail(resetPasswordDTO.getEmailAddress());
+        return ResponseEntity.ok("Password change successful");
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<String> updateUser(UpdateUserDTO updateUserDTO) {
+       boolean userExists = userRepository.existsByEmailAddress(updateUserDTO.getEmailAddress());
+       if (!userExists) {
+           throw new UserNameNotFoundException(updateUserDTO.getFirstName()+ " " + updateUserDTO.getLastName());
+       }
+       User user =
+       userRepository.updateUser(updateUserDTO.getFirstName(), updateUserDTO.getLastName(),
+               updateUserDTO.getAddress(), updateUserDTO.getCity(), updateUserDTO.getState(),
+               updateUserDTO.getNationality(), updateUserDTO.getPhoneNumber(), updateUserDTO.getEmailAddress());
+        return ResponseEntity.ok("Hello " + user.getFirstName() + ", Your update operation is successful");
+    }
+
+
+
 }

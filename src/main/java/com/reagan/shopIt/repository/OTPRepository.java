@@ -15,5 +15,5 @@ public interface OTPRepository extends JpaRepository<AuthToken, Long> {
     @Query(value = "select i from AuthToken i", nativeQuery = true)
     List<AuthToken> getAllTokens();
 
-    Optional<AuthToken> findByToken(OneTimePasswordDTO token);
+    Optional<AuthToken> findByToken(String token);
 }

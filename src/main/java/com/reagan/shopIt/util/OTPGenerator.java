@@ -1,5 +1,7 @@
 package com.reagan.shopIt.util;
 
+import org.springframework.http.ResponseEntity;
+
 public interface OTPGenerator {
 
     String createVerificationToken();
@@ -7,4 +9,5 @@ public interface OTPGenerator {
     String createPasswordResetToken();
 
     String createOrderTrackingCode();
+
 }

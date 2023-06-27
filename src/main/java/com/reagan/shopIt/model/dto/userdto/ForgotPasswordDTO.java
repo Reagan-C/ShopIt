@@ -8,7 +8,6 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class ForgotPasswordDTO {
 
     @JsonProperty("email_address")

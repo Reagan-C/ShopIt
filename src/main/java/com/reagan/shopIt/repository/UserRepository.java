@@ -1,7 +1,9 @@
 package com.reagan.shopIt.repository;
 
+import com.reagan.shopIt.model.domain.Country;
 import com.reagan.shopIt.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +20,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findByEmailAddress(String email);
 
     Boolean existsByEmailAddress(String emailAddress);
+
+    @Modifying
+    @Query(value = "update User u set u.firstName = ?1, u.lastName = ?2, u.address = ?3, u.city = ?4, u.country = ?5, "+
+            "u.phoneNumber = ?6 where u.emailAddress = ?7", nativeQuery = true)
+    User updateUser(String firstName, String lastName, String address, String city, String state, Country country,
+                    String phoneNumber, String emailAddress);
 
     @Query(value = "select i from User i", nativeQuery = true)
     List<User> getAllUsers();
