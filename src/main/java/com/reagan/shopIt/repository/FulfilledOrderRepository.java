@@ -1,5 +1,6 @@
 package com.reagan.shopIt.repository;
 
+import com.reagan.shopIt.model.domain.AuthToken;
 import com.reagan.shopIt.model.domain.FulfilledOrders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,6 @@ public interface FulfilledOrderRepository extends JpaRepository<FulfilledOrders,
 
     @Query(value = "select i from FulfilledOrders i", nativeQuery = true)
     List<FulfilledOrders> getAllFulfilledOrders();
+
+    FulfilledOrders findByToken(String token);
 }

@@ -1,118 +1,129 @@
 
 
- create table IF NOT EXISTS `admin` (
-        `id` bigint not null auto_increment,
-        primary key (`id`)
+ CREATE TABLE IF NOT EXISTS `admin` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `cart` (
-        `id` bigint not null auto_increment,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `cart` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `user_id` BIGINT,
+        `total_price` DOUBLE,
+        PRIMARY KEY (`id`)
+    );
+
+    CREATE TABLE IF NOT EXISTS `cart_item` (
+            `id` BIGINT NOT NULL AUTO_INCREMENT,
+            `cart_id`   BIGINT,
+            `item_id` BIGINT,
+            `count_of_items`  INT,
+            `cart_item_price`  DOUBLE,
+            PRIMARY KEY (`id`)
+        );
+
+
+    CREATE TABLE IF NOT EXISTS `category` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `category_name` VARCHAR(255) NOT NULL,
+        `abbreviation` VARCHAR(255) NOT NULL,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `category` (
-        `id` bigint not null auto_increment,
-        `abbreviation` varchar(255) not null,
-        `category_name` varchar(255) not null,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `country` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `title` VARCHAR(255) NOT NULL,
+        `abbreviation` VARCHAR(255) NOT NULL,
+        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `country` (
-        `id` bigint not null auto_increment,
-        `abbreviation` varchar(255) not null,
-        `created_on` datetime(6) not null,
-        `title` varchar(255) not null,
-        `updated_on` datetime(6) not null,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `fulfilled_orders` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `user_id` BIGINT,
+        `token` VARCHAR (255),
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `confirmed_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `fulfilled_orders` (
-        `id` bigint not null auto_increment,
-        `created_on` datetime(6) not null,
-        `fulfilled_on` datetime(6) not null,
-        `user_id` bigint,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `items` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `name` VARCHAR(255) NOT NULL,
+        `description` VARCHAR(255) NOT NULL,
+        `price` FLOAT(53) NOT NULL,
+        `quantity` BIGINT NOT NULL,
+        `picture` VARCHAR(255) NOT NULL,
+        `category_id` BIGINT,
+        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `items` (
-        `id` bigint not null auto_increment,
-        `created_on` datetime(6) not null,
-        `description` varchar(255) not null,
-        `name` varchar(255) not null,
-        `picture` varchar(255) not null,
-        `price` float(53) not null,
-        `quantity` bigint not null,
-        `updated_on` datetime(6) not null,
-        `category_id` bigint,
-        `cart_id` bigint,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `auth_token` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `token` VARCHAR(255) NOT NULL,
+        `user_id` BIGINT,
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `confirmed_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `expires_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `auth_token` (
-        `id` bigint not null auto_increment,
-        `token` varchar(255) not null,
-        `created_at` datetime(6) not null,
-        `confirmed_at` datetime(6),
-        `expires_at` datetime(6) not null,
-        `user_id` bigint,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `pending_order` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `confirmed` BOOLEAN NOT NULL DEFAULT FALSE,
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `token` VARCHAR (255),
+        `cart_id` BIGINT,
+        `user_id` BIGINT,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `pending_order` (
-        `id` bigint not null auto_increment,
-        `confirmed` BOOLEAN not null DEFAULT FALSE,
-        `created_on` datetime(6) not null,
-        `cart_id` bigint,
-        `user_id` bigint,
-        `fulfilled_orders_id` bigint,
-        primary key (`id`)
+    CREATE TABLE IF NOT EXISTS `roles` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `code` VARCHAR(255) NOT NULL,
+        `title` VARCHAR(255) NOT NULL,
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `roles` (
-        `id` bigint not null auto_increment,
-        `code` varchar(255) not null,
-        `title` varchar(255) not null,
-        `created_on` datetime(6) not null,
-        `updated_on` datetime(6) not null,
-        primary key (`id`)
-    );
-
-
-    create table IF NOT EXISTS `user` (
-        `id` bigint not null auto_increment,
-        `address` varchar(255),
-        `authentication_token` varchar(255),
-        `city` varchar(255),
-        `created_on` datetime(6) not null,
+    CREATE TABLE IF NOT EXISTS `user` (
+        `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `first_name` VARCHAR(255),
+        `last_name` VARCHAR(255),
+        `email` VARCHAR(255),
+        `address` VARCHAR(255),
+        `phone_number` VARCHAR(255),
+        `state` VARCHAR(255),
+        `username` VARCHAR(255),
+        `enabled` BOOLEAN NOT NULL DEFAULT FALSE,
+        `city` VARCHAR(255),
         `date_of_birth` date,
-        `email` varchar(255),
-        `first_name` varchar(255),
-        `last_name` varchar(255),
-        `password` varchar(255),
-        `phone_number` varchar(255),
-        `enabled` BOOLEAN not null DEFAULT FALSE,
-        `state` varchar(255),
-        `updated_on` datetime(6) not null,
-        `username` varchar(255),
-        `cart_id` bigint,
-        `country_id` bigint,
-        `admin_id` bigint,
-        primary key (`id`)
+        `password` VARCHAR(255),
+        `authentication_token` VARCHAR(255),
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `cart_id` BIGINT,
+        `country_id` BIGINT,
+        PRIMARY KEY (`id`)
     );
 
 
-    create table IF NOT EXISTS `user_roles` (
-        `user_id` bigint not null,
-        `roles_id` bigint not null,
-        primary key (`user_id`, `roles_id`)
+    CREATE TABLE IF NOT EXISTS `user_roles` (
+        `user_id` BIGINT NOT NULL,
+        `roles_id` BIGINT NOT NULL,
+        PRIMARY KEY (`user_id`, `roles_id`)
     );
 
 

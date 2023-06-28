@@ -18,11 +18,13 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
 
+    @OneToOne
+    private User user;
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     private Set<CartItem> cartItems = new HashSet<>();
 
-
+    @Column(name = "total_price")
     double totalPrice = 0.0;
     public String addItem(Item item) {
         if (item.getQuantity() > 0) {

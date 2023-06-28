@@ -14,8 +14,7 @@ public class PasswordNotOtherUserFieldsValidator implements ConstraintValidator<
     @Override
     public boolean isValid(SignUpDTO user, ConstraintValidatorContext constraintValidatorContext) {
         String password = user.getPassword();
-        return !password.equals(user.getUsername()) &&
-               !password.equals(user.getFirstName()) &&
+        return !password.equals(user.getFirstName()) &&
                !password.equals(user.getLastName()) &&
                !password.equals(user.getEmailAddress());
     }

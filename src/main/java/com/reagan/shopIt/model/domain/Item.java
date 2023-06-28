@@ -29,10 +29,10 @@ public class Item {
     private double price;
 
     @Column(nullable = false)
-    private String picture;
+    private Long quantity;
 
     @Column(nullable = false)
-    private Long quantity;
+    private String picture;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "category_id")
@@ -40,12 +40,12 @@ public class Item {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_on", updatable = false, nullable = false)
+    @Column(name = "added_on", updatable = false, nullable = false)
     private Date createdOn;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_on", nullable = false)
+    @Column(name = "updated_on")
     private Date updatedOn;
 
 }

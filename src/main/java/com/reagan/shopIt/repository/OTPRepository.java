@@ -1,7 +1,7 @@
 package com.reagan.shopIt.repository;
 
 import com.reagan.shopIt.model.domain.AuthToken;
-import com.reagan.shopIt.model.dto.onetimepassword.OneTimePasswordDTO;
+import com.reagan.shopIt.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -16,4 +16,6 @@ public interface OTPRepository extends JpaRepository<AuthToken, Long> {
     List<AuthToken> getAllTokens();
 
     Optional<AuthToken> findByToken(String token);
+
+    Optional<AuthToken> findByUser(User user);
 }

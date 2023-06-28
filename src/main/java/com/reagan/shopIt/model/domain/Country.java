@@ -30,11 +30,11 @@ public class Country {
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_on", updatable = false, nullable = false)
+    @Column(name = "added_on", updatable = false, nullable = false)
     private Date createdOn;
 
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "updated_on", nullable = false)
+    @Column(name = "updated_on")
     private Date updatedOn;
 }

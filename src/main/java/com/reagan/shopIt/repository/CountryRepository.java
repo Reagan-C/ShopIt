@@ -16,6 +16,6 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
 
     Optional<Country> findByAbbreviationAndTitle(String abbreviation, String title);
 
-    Country findByTitle(Country nationality);
+    Country findByTitle(String nationality);
 
 }

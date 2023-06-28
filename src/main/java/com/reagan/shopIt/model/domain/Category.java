@@ -25,5 +25,10 @@ public class Category {
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private Set<Item> items = new HashSet<>();
+
+    //add items to category
+    public void addItemToCategory(Item item) {
+        this.getItems().add(item);
+    }
 }
 

@@ -29,6 +29,8 @@ public class PendingOrder {
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
+    @Column(name = "token")
+    private String token;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on", updatable = false, nullable = false)

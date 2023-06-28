@@ -19,5 +19,5 @@ public interface PendingOrderRepository extends JpaRepository<PendingOrder, Long
     @Query(value = "select i from PendingOrder i", nativeQuery = true)
     List<PendingOrder> getAllOrders();
 
-    PendingOrder findByUser(User user);
+    PendingOrder findByToken(String token);
 }

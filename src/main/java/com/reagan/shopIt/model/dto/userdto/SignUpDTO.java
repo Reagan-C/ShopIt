@@ -24,10 +24,6 @@ import java.util.Date;
 @Builder
 public class SignUpDTO implements Serializable {
 
-    @JsonProperty("username")
-    @NotBlank(message = "{user.username.notBlank}")
-    private String username;
-
     @JsonProperty("email")
     @Email(message = "{user.email.valid}")
     private String emailAddress;
@@ -76,6 +72,6 @@ public class SignUpDTO implements Serializable {
 
     @JsonProperty("nationality_id")
     @NotBlank(message = "{user.country.notBlank}")
-    private Country nationality;
+    private String nationality;
 
 }

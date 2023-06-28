@@ -146,7 +146,8 @@ public class EmailServiceImpl implements EmailService {
                 "font-weight:600\"><img style=\"height:55px; width:55px\" src=\"/\" /></a>" + "<p>ShopIt</p>" +
                 "</div>" + "<p style=\"font-size:1.1em\">" + "<b>Hello " + user.getFirstName() + ",</b>" + "<br>" +
                 "Your order has been placed and your order tracking code is " + orderTrackingCode + " ,and will " +
-                "be delivered to your address, " +user.getAddress() + " within two weeks. <br>" +
+                "be delivered to your address, " +user.getAddress() + " within two weeks. Total cost " +
+                "of package is " + user.getCart().getTotalPrice() + "<br>" +
                 "Best regards, " + "<br>" + "ShopIt Team.</p>" +
                 " <hr style=\"border:none;border-top:1px solid #eee\" />" +
                 "<div style=\"margin-top: 20px;padding:8px 0;color:#aaa;font-size:1.0em;line-height:1;" +

@@ -4,7 +4,7 @@ import com.reagan.shopIt.config.security.jwt.JwtTokenProvider;
 import com.reagan.shopIt.model.domain.*;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
 import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
-import com.reagan.shopIt.model.dto.onetimepassword.OneTimePasswordDTO;
+import com.reagan.shopIt.model.dto.onetimepassword.TokenDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import com.reagan.shopIt.model.enums.UserRoleType;
 import com.reagan.shopIt.model.exception.*;
@@ -15,9 +15,7 @@ import com.reagan.shopIt.util.OTPGenerator;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
@@ -61,6 +58,8 @@ public class UserServiceImpl implements UserService {
 
     private final RoleRepository roleRepository;
 
+    private final CartRepository cartRepository;
+
     private final OTPGenerator generator;
 
     private final CountryRepository countryRepository;
@@ -70,12 +69,13 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository, FulfilledOrderRepository fulfilledOrderRepository,
                            PendingOrderRepository pendingOrderRepository, OTPRepository otpRepository,
-                           RoleRepository roleRepository, OTPGenerator generator, CountryRepository countryRepository, ItemRepository itemRepository) {
+                           RoleRepository roleRepository, CartRepository cartRepository, OTPGenerator generator, CountryRepository countryRepository, ItemRepository itemRepository) {
         this.userRepository = userRepository;
         this.fulfilledOrderRepository = fulfilledOrderRepository;
         this.pendingOrderRepository = pendingOrderRepository;
         this.otpRepository = otpRepository;
         this.roleRepository = roleRepository;
+        this.cartRepository = cartRepository;
         this.generator = generator;
         this.countryRepository = countryRepository;
         this.itemRepository = itemRepository;
@@ -89,30 +89,34 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException();
         }
 
+        // create new user if user does not exist, encode password and set role as regular
         User newUser = mapper.map(body, User.class);
         newUser.setPassword(passwordEncoder.encode(body.getPassword()));
-        newUser.addRole(roleRepository.findByTitle(UserRoleType.REGULAR.getValue()));
+        newUser.addRegularRole(roleRepository.findByTitle(UserRoleType.REGULAR.getValue()));
 
         //check if country exists and assign to user
         Country country = countryRepository.findByTitle(body.getNationality());
         if (country != null) {
             newUser.setCountry(country);
         } else {
-            throw new IllegalStateException("Country doesn't exist by this title");
+            throw new IllegalArgumentException("Country doesn't exist by this title");
         }
 
-        //Generate and save confirmation token
+        //Generate and save confirmation token to AuthToken class. also set user auth token to token
         String token = generator.createVerificationToken();
         AuthToken authToken = new AuthToken();
         authToken.setToken(token);
         authToken.setCreatedAt(LocalDateTime.now());
+        authToken.setConfirmedAt(null);
         authToken.setExpiresAt(LocalDateTime.now().plusMinutes(20));
         authToken.setUser(newUser);
 
-        // create link
+        newUser.setAuthenticationToken(token);
+
+        // create link,  calling the confirm token api
         String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
 
-        // Send email notification and save user and otp
+        // Send email notification and save user and auth token
         emailService.sendAccountConfirmationMail(newUser.getEmailAddress(),
                 emailService.buildEmail(newUser.getFirstName(), link));
         userRepository.save(newUser);
@@ -122,34 +126,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> confirmSignUpToken(OneTimePasswordDTO token) {
+    public ResponseEntity<String> confirmSignUpToken(TokenDTO token) {
         User user1;
 
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(token.toString())
+        AuthToken confirmationToken = otpRepository.findByToken(token.getName())
                 .orElseThrow(InvalidOtpException::new);
 
-        //check if token is confirmed
+        //check if token is already confirmed
         if (confirmationToken.getConfirmedAt() != null) {
             throw new ConfirmedOtpException();
         }
 
         //check if token has expired, and remove user if not enabled
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            user1 = userRepository.findByEmailAddress(confirmationToken.getUser().getEmailAddress());
-            if (user1.getEnabled().equals(false)) {
-                userRepository.delete(user1);
-            }
+        user1 = userRepository.findByEmailAddress(confirmationToken.getUser().getEmailAddress());
+        if (expiredAt.isBefore(LocalDateTime.now()) && user1.getEnabled().equals(false)) {
+            userRepository.delete(user1);
             throw new ExpiredOtpException();
         }
 
-        //if valid, set confirmed at. Also set user enabled to true and send welcome mail
+        //if valid, set confirmed at. Also set user enabled to true and send welcome mail and clear token in user
         confirmationToken.setConfirmedAt(LocalDateTime.now());
-        user1 = userRepository.findByEmailAddress(confirmationToken.getUser().getEmailAddress());
         user1.setEnabled(true);
         user1.setAuthenticationToken(null);
         emailService.sendWelcomeMessage(user1.getEmailAddress());
+
+        userRepository.save(user1);
+        otpRepository.save(confirmationToken);
 
         return ResponseEntity.ok("Account has been confirmed, Please visit site to log in!!!");
 
@@ -177,20 +181,24 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-
     @Override
-    public String sendChangePasswordOtp(ForgotPasswordDTO email) {
-        User user2 = userRepository.findByEmailAddress(email.getEmailAddress());
-        if (user2 != null) {
-            String token = generator.createPasswordResetToken();
-            AuthToken authToken = new AuthToken();
-            authToken.setToken(token);
-            authToken.setCreatedAt(LocalDateTime.now());
-            authToken.setExpiresAt(LocalDateTime.now().plusMinutes(20));
-            authToken.setUser(user2);
-            otpRepository.save(authToken);
-            emailService.sendChangePasswordMail(email.getEmailAddress(), token);
+    public String sendChangePasswordOtp(ForgotPasswordDTO forgotPasswordDTO) {
+        User user = userRepository.findByEmailAddress(forgotPasswordDTO.getEmailAddress());
+        if (user == null) {
+            throw new UserNameNotFoundException(forgotPasswordDTO.getEmailAddress());
         }
+        //Generate otp and send to user
+        String token = generator.createPasswordResetToken();
+        AuthToken authToken = new AuthToken();
+        authToken.setToken(token);
+        authToken.setCreatedAt(LocalDateTime.now());
+        authToken.setExpiresAt(LocalDateTime.now().plusMinutes(20));
+        authToken.setUser(user);
+        authToken.setConfirmedAt(null);
+
+        otpRepository.save(authToken);
+        emailService.sendChangePasswordMail(forgotPasswordDTO.getEmailAddress(), token);
+
         return "Please check your Email for otp";
     }
 
@@ -208,7 +216,7 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("New password cannot be same with old password");
         }
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(resetPasswordDTO.getOtp().toString())
+        AuthToken confirmationToken = otpRepository.findByToken(resetPasswordDTO.getOtp())
                 .orElseThrow(InvalidOtpException::new);
 
         //check if token is already confirmed
@@ -224,6 +232,9 @@ public class UserServiceImpl implements UserService {
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         //set new existing user password
         existingUser.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
+
+        userRepository.save(existingUser);
+        otpRepository.save(confirmationToken);
         //send email to user
         emailService.sendSuccessfulPasswordChangeMail(resetPasswordDTO.getEmailAddress());
         return ResponseEntity.ok("Password change successful");
@@ -244,10 +255,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<User> findUserByEmail(String emailAddress) {
-         User user = userRepository.findByEmailAddress(emailAddress);
+    public ResponseEntity<User> findUserByEmail(EmailAddressDTO emailAddressDTO) {
+         User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
          if (user == null) {
-             throw new UserNameNotFoundException(emailAddress);
+             throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
          }
          return ResponseEntity.ok(user);
     }
@@ -313,10 +324,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<CartItem> viewItemsInCart(String emailAddress) {
-        User user = userRepository.findByEmailAddress(emailAddress);
+    public Set<CartItem> viewItemsInCart(EmailAddressDTO emailAddressDTO) {
+        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
         if (user == null) {
-            throw new UserNameNotFoundException(emailAddress);
+            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
         }
         Cart userCart = user.getCart();
         if (userCart == null) {
@@ -327,10 +338,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> placeOrder(String emailAddress) {
-        User user = userRepository.findByEmailAddress(emailAddress);
+    public ResponseEntity<String> placeOrder(EmailAddressDTO emailAddressDTO) {
+        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
         if (user == null) {
-            throw new UserNameNotFoundException(emailAddress);
+            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
         }
         Cart cartToOrder = user.getCart();
         if (cartToOrder == null) {
@@ -346,65 +357,82 @@ public class UserServiceImpl implements UserService {
         AuthToken authToken = new AuthToken();
         authToken.setUser(user);
         authToken.setCreatedAt(LocalDateTime.now());
+        authToken.setConfirmedAt(null);
         authToken.setToken(token);
-        authToken.setExpiresAt(LocalDateTime.now().plusDays(30));
+        authToken.setExpiresAt(LocalDateTime.now().plusDays(365));
         // save items in cart to pending orders table
         PendingOrder pendingOrder = new PendingOrder();
         pendingOrder.setUser(user);
         pendingOrder.setCart(cartToOrder);
+        pendingOrder.setToken(token);
         pendingOrder.setCreatedOn(new Date());
-        //reset cart to 0 items
+        //update user field
         user.addPendingOrder(pendingOrder);
-        cartToOrder.resetCart();
-        user.resetUserCart();
+        user.setAuthenticationToken(token);
 
-        //save pending orders, otp and update user wrt pending orders
+        // Get total price of items in cart
+        double totalPrice = cartToOrder.getTotalPrice();
+
+        //send order details email
+        emailService.sendOrderTrackingMail(emailAddressDTO.getEmailAddress(),token);
+
+        //reset fields and persist
+        user.resetUserCart();
+        cartToOrder.resetCart();
         pendingOrderRepository.save(pendingOrder);
         otpRepository.save(authToken);
+        cartRepository.save(cartToOrder);
         userRepository.save(user);
-
-        emailService.sendOrderTrackingMail(emailAddress,authToken.toString());
-
         return ResponseEntity.ok("Order Placed. An order tracking code has been sent to your" +
-                "registered email address");
+                "registered email address. Total cost is " + totalPrice);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> confirmOrderReceptionMail(EmailAddressDTO emailAddressDTO) {
+    public ResponseEntity<?> confirmOrderReceptionMail(EmailAddressDTO emailAddressDTO) {
         User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
         if (user == null) {
             throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
         }
+
         String token = user.getAuthenticationToken();
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(user.getFirstName() + " " +
+                    "has no valid token");
+        }
+
         String link = "http://localhost:8080/api/v1/orders/confirm-order?token=" + token;
 
         FulfilledOrders fulfilledOrders = new FulfilledOrders();
         fulfilledOrders.setUser(user);
         fulfilledOrders.setCreatedOn(new Date());
+        fulfilledOrders.setConfirmedOn(null);
+        fulfilledOrders.setToken(token);
 
-        PendingOrder pendingOrder = pendingOrderRepository.findByUser(user);
+        PendingOrder pendingOrder = pendingOrderRepository.findByToken(token);
         pendingOrder.setConfirmed(true);
         fulfilledOrders.addFulfilledOrder(pendingOrder);
 
+        // To remove order from user's pending order
+        user.removeFromPendingOrder(pendingOrder);
+
+        // save updates
         fulfilledOrderRepository.save(fulfilledOrders);
-        pendingOrderRepository.delete(pendingOrder);
+        pendingOrderRepository.save(pendingOrder);
         userRepository.save(user);
 
         emailService.sendOrderDeliveryMail(emailAddressDTO.getEmailAddress(),
                 emailService.buildOrderConfirmationEmail(user.getFirstName(), link));
 
-        return null;
+        return ResponseEntity.status(HttpStatus.OK).body("Please proceed to your email account to confirm");
     }
 
     @Override
     @Transactional
-    public String confirmOrder(ConfirmOrderDTO orderDTO) {
-        User user1;
-
+    public String confirmOrder(String token) {
 
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(orderDTO.getToken())
+        AuthToken confirmationToken = otpRepository.findByToken(token)
                 .orElseThrow(InvalidOtpException::new);
 
         if (confirmationToken.getConfirmedAt() != null) {
@@ -416,8 +444,26 @@ public class UserServiceImpl implements UserService {
             throw new ExpiredOtpException();
         }
 
+        FulfilledOrders fulfilledOrder = fulfilledOrderRepository.findByToken(token);
+        if (fulfilledOrder == null) {
+            throw new IllegalArgumentException("Fulfilled order associated with token not found");
+        }
+
+        User user = userRepository.findByAuthenticationToken(token);
+        if (user == null) {
+            throw new IllegalArgumentException("No user found for token");
+        }
+
+        fulfilledOrder.setConfirmedOn(new Date());
         confirmationToken.setConfirmedAt(LocalDateTime.now());
+
+        user.addFulfilledOrder(fulfilledOrder);
+        user.setAuthenticationToken(null);
+
         otpRepository.save(confirmationToken);
+        fulfilledOrderRepository.save(fulfilledOrder);
+        userRepository.save(user);
+
         return "Thank you for shopping with us!";
     }
 }

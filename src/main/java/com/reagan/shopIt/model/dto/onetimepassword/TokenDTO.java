@@ -1,7 +1,6 @@
 package com.reagan.shopIt.model.dto.onetimepassword;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.reagan.shopIt.model.domain.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -10,10 +9,10 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class OneTimePasswordDTO {
+public class TokenDTO {
 
     @JsonProperty("otp")
     @NotBlank(message = "Please enter otp")
-    private String token;
+    private String name;
 
 }

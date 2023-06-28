@@ -1,19 +1,28 @@
 package com.reagan.shopIt.model.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class CartItem {
-    private Item item;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private  Long id;
 
+    @ManyToOne
+    private Item item = new Item();
+
+    @ManyToOne
+    private  Cart cart;
+
+    @Column(name = "count_of_items", nullable = false)
     private int count = 1;
 
+    @Column(name = "cart_item_price", nullable = false)
     private double cartItemPrice = this.getItem().getPrice();
 
     public void increaseCount() {
