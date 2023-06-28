@@ -15,16 +15,13 @@ public class DTOTests {
 
     @Test
     public void testUser() {
-        Set<User> user = new HashSet<>();
-        Admin admin = new Admin(1L,user);
-        User user2 = new User();
-        User user3 = new User();
-        admin.addAdmin(user2);
-        admin.addAdmin(user3);
+
+        Admin admin = new Admin(1L, 5L, "reaganchisom@gmail.com", "Reagan",
+                "Bill");
 
         assertThat(admin.getId()).isEqualTo(1L);
-        assertThat(admin.getUsers()).isEqualTo(user);
-        assertThat(admin.getUsers().size()).isEqualTo(2);
+        assertThat(admin.getUserFirstName().equals("Reagan"));
+        assertThat(admin.getUserId().equals(5L));
     }
 
 //    @Test

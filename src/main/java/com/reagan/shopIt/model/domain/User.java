@@ -103,6 +103,11 @@ public class User {
         this.getRoles().add(userRole);
     }
 
+    public void removeFromAdmin(UserRole userRole) {
+        this.getRoles().remove(userRole);
+    }
+
+
     public void addPendingOrder(PendingOrder pendingOrder) {
         this.getPendingOrders().add(pendingOrder);
     }

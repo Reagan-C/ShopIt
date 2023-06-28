@@ -2,6 +2,10 @@
 
  CREATE TABLE IF NOT EXISTS `admin` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
+        `user_id` BIGINT NOT NULL,
+        `user_email` VARCHAR(255),
+        `user_first_name` VARCHAR(255),
+        `user_last_name` VARCHAR(255),
         PRIMARY KEY (`id`)
     );
 
