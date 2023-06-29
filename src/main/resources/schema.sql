@@ -60,7 +60,7 @@
         `name` VARCHAR(255) NOT NULL,
         `description` VARCHAR(255) NOT NULL,
         `price` FLOAT(53) NOT NULL,
-        `quantity` BIGINT NOT NULL,
+        `quantity` INT NOT NULL,
         `picture` VARCHAR(255) NOT NULL,
         `category_id` BIGINT,
         `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,

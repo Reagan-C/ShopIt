@@ -29,7 +29,7 @@ public class Item {
     private double price;
 
     @Column(nullable = false)
-    private Long quantity;
+    private Integer quantity;
 
     @Column(nullable = false)
     private String picture;

@@ -4,6 +4,7 @@ import com.reagan.shopIt.model.domain.CartItem;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
 import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
+import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.model.dto.onetimepassword.TokenDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import jakarta.transaction.Transactional;

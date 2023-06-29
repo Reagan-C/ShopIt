@@ -34,7 +34,7 @@ public class AddItemDTO implements Serializable {
 
     @JsonProperty("quantity")
     @NotBlank(message = "{product.quantity.notBlank}")
-    private Long quantity;
+    private Integer quantity;
 
     @JsonProperty("category")
     @NotBlank(message = "{product.category.notBlank}")

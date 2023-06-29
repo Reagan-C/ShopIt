@@ -30,5 +30,9 @@ public class Category {
     public void addItemToCategory(Item item) {
         this.getItems().add(item);
     }
+
+    public void removeItemFromCategory() {
+        this.setItems(new HashSet<>());
+    }
 }
 

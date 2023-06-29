@@ -91,4 +91,19 @@ public class AdminServiceImpl implements AdminService {
     public List<?> getAllAdmins() {
         return adminRepository.findAll();
     }
+
+    @Override
+    public User findUser(AdminDTO adminDTO) {
+        boolean userExists = userRepository.existsByEmailAddress(adminDTO.getUserEmailAddress());
+        if (!userExists) {
+            throw new UserNameNotFoundException(adminDTO.getUserEmailAddress());
+        }
+
+        boolean isUserAnAdmin = adminRepository.existsByUserEmail(adminDTO.getUserEmailAddress());
+        if (!isUserAnAdmin) {
+            throw new IllegalArgumentException("User is not an admin");
+        }
+
+        return userRepository.findByEmailAddress(adminDTO.getUserEmailAddress());
+    }
 }

@@ -1,4 +1,4 @@
-package com.reagan.shopIt.model.dto.userdto;
+package com.reagan.shopIt.model.dto.emailaddressdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;

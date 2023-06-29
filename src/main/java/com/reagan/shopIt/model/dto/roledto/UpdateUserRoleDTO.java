@@ -1,7 +1,7 @@
 package com.reagan.shopIt.model.dto.roledto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -10,11 +10,15 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class UserRoleDTO {
+public class UpdateUserRoleDTO {
 
+
+    @Transient
+    @NotBlank(message = "{role.title.notBlank}")
+    private String oldTitle;
     @JsonProperty("title")
     @NotBlank(message = "{role.title.notBlank}")
-    private String title;
+    private String newTitle;
 
     @JsonProperty("code")
     @NotBlank(message = "{role.code.notBlank}")

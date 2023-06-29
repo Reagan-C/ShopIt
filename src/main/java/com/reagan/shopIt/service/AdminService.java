@@ -1,5 +1,6 @@
 package com.reagan.shopIt.service;
 
+import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.admindto.AdminDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -15,4 +16,6 @@ public interface AdminService {
     ResponseEntity<?> removeUserFromAdmin(AdminDTO adminDTO);
 
     List<?> getAllAdmins();
+
+    User findUser (AdminDTO adminDTO);
 }

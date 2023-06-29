@@ -2,7 +2,6 @@ package com.reagan.shopIt.model.dto.itemdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @AllArgsConstructor
@@ -10,19 +9,13 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class UpdateItemDTO {
+public class SetItemPriceDTO {
 
     @JsonProperty("name")
     @NotBlank(message = "{product.name.notBlank}")
     private String itemName;
 
-    @JsonProperty("description")
-    @NotBlank(message = "{product.description.notBlank}")
-    @Size(min = 25, message = "{product.description.size}")
-    private String description;
-
     @JsonProperty("price")
-    @NotBlank(message = "{product.price.notBlank}")
+    @NotBlank(message = "Price field should be populated")
     private double price;
-
 }
