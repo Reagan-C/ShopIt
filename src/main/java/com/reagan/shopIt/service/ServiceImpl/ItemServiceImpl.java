@@ -32,17 +32,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ResponseEntity<?> addNewItem(AddItemDTO addItemDTO) {
-        Item item = itemRepository.findByName(addItemDTO.getName());
-        if (item != null) {
+        boolean itemExists = itemRepository.existsByName(addItemDTO.getName());
+        if (itemExists) {
             throw new IllegalArgumentException(addItemDTO.getName()+ " already exists in our record");
         }
+        // check whether category name is valid
         Category itemCategory = categoryRepository.findByName(addItemDTO.getCategoryName());
         if (itemCategory == null) {
             throw new CategoryNotFoundException(addItemDTO.getCategoryName());
         }
-
+        Item item = new Item();
         item.setCategory(itemCategory);
-        item = mapper.map(addItemDTO, Item.class);
+        item.setName(addItemDTO.getName());
+        item.setPrice(addItemDTO.getPrice());
+        item.setQuantity(addItemDTO.getQuantity());
+        item.setDescription(addItemDTO.getDescription());
+        item.setPicture(addItemDTO.getPicture());
+
         itemRepository.save(item);
         return ResponseEntity.ok("Item added");
     }
@@ -63,7 +69,9 @@ public class ItemServiceImpl implements ItemService {
         if (item == null) {
             throw  new ItemNotFoundException(updateItemDTO.getItemName());
         }
-        item = mapper.map(updateItemDTO, Item.class);
+        item.setDescription(updateItemDTO.getDescription());
+        item.setPrice(updateItemDTO.getPrice());
+        item.setName(updateItemDTO.getItemNewName());
         itemRepository.save(item);
         return item;
     }
@@ -86,22 +94,35 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemNotFoundException(priceDTO.getItemName());
         }
         item.setPrice(priceDTO.getPrice());
+        itemRepository.save(item);
         return ResponseEntity.ok(item);
     }
 
     @Override
     public List<?> findItemByCategory(ItemCategoryDTO itemCategoryDTO) {
-
-        return null;
+        Category category = categoryRepository.findByName(itemCategoryDTO.getCategoryName());
+        if (category == null) {
+            throw new CategoryNotFoundException(itemCategoryDTO.getCategoryName());
+        }
+        //if category exists, return all items in category
+        return itemRepository.getItemsByCategoryName(category.getName());
     }
 
     @Override
     public List<Item> getAllItems() {
-        return null;
+        List<Item> items = itemRepository.getAllItems();
+        if (items.isEmpty()) {
+            throw new IllegalArgumentException("No items in the records yet");
+        }
+        return items;
     }
 
     @Override
     public Item findByName(String itemName) {
-        return null;
+        Item item = itemRepository.findByName(itemName);
+        if (item != null){
+            return item;
+        }
+        throw new ItemNotFoundException(itemName);
     }
 }

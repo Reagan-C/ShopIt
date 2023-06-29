@@ -16,6 +16,10 @@ public class UpdateItemDTO {
     @NotBlank(message = "{product.name.notBlank}")
     private String itemName;
 
+    @JsonProperty("name")
+    @NotBlank(message = "{product.name.notBlank}")
+    private String itemNewName;
+
     @JsonProperty("description")
     @NotBlank(message = "{product.description.notBlank}")
     @Size(min = 25, message = "{product.description.size}")

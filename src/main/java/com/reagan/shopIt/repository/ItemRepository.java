@@ -26,4 +26,6 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> getAllItems();
 
     Item findByName(String name);
+
+    Boolean existsByName(String name);
 }
