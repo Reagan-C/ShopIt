@@ -23,7 +23,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private PasswordEncoder passwordEncoder;
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public JwtAuthenticationProvider(UserRepository userRepository) {
         this.userRepository = userRepository;

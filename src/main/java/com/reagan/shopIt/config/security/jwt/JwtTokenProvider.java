@@ -76,25 +76,5 @@ public class JwtTokenProvider implements Serializable {
                 .getSubject();
     }
 
-    public String getJwtFromCookies(HttpServletRequest request) {
-        Cookie cookie = WebUtils.getCookie(request, jwtConfig.getCookieName());
-        if (cookie != null) {
-            return cookie.getValue();
-        } else {
-            return null;
-        }
-    }
-
-    public ResponseCookie generateJwtCookie(UserDetails userDetails) {
-        String jwt = generateJwtToken(userDetails.getUsername());
-        ResponseCookie cookie;
-        cookie = ResponseCookie.from(jwtConfig.getCookieName(), jwt).path("/api").maxAge(jwtConfig.getTokenValidity()
-        ).httpOnly(true).build();
-        return cookie;
-    }
-
-    public ResponseCookie getCleanJwtCookie() {
-        return ResponseCookie.from(jwtConfig.getCookieName(), null).path("/api").build();
-    }
 
 }

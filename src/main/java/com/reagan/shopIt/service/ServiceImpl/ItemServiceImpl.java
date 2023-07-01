@@ -36,12 +36,14 @@ public class ItemServiceImpl implements ItemService {
         if (itemExists) {
             throw new IllegalArgumentException(addItemDTO.getName()+ " already exists in our record");
         }
+        System.out.println("Item can be added");
         // check whether category name is valid
         Category itemCategory = categoryRepository.findByName(addItemDTO.getCategoryName());
         if (itemCategory == null) {
             throw new CategoryNotFoundException(addItemDTO.getCategoryName());
         }
         Item item = new Item();
+        System.out.println("item created");
         item.setCategory(itemCategory);
         item.setName(addItemDTO.getName());
         item.setPrice(addItemDTO.getPrice());

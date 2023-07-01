@@ -9,6 +9,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import static org.hibernate.engine.config.spi.StandardConverters.asString;
@@ -33,5 +36,18 @@ public class ShopItUtil {
 
     public ResponseEntity<String> signInResponse() {
         return null;
+    }
+
+    public static UserDetails getCurrentUser() {
+        SecurityContext context = SecurityContextHolder.getContext();
+        Object principal = context.getAuthentication().getPrincipal();
+        System.out.println(principal);
+        if (principal instanceof UserDetails) {
+            System.out.println((UserDetails) context.getAuthentication().getPrincipal());
+            return (UserDetails) context.getAuthentication().getPrincipal();
+        }
+        else {
+            return null;
+        }
     }
 }

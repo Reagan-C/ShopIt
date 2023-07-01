@@ -169,15 +169,13 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Username or Password incorrect");
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(body.getEmailAddress());
-        ResponseCookie cookie = tokenProvider.generateJwtCookie(userDetails);
 
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body("Login Successful");
+        return ResponseEntity.ok().body("Login Successful");
     }
 
     @Override
     public ResponseEntity<?> signOut() {
-        ResponseCookie cookie = tokenProvider.getCleanJwtCookie();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(
+        return ResponseEntity.ok().body(
                 "You have been signed out"
         );
     }
