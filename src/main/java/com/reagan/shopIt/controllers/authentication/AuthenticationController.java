@@ -1,4 +1,4 @@
-package com.reagan.shopIt.controllers.user;//package com.reagan.shopIt.controllers;
+package com.reagan.shopIt.controllers.authentication;
 
 import com.reagan.shopIt.service.UserService;
 import org.springframework.http.MediaType;
@@ -6,16 +6,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "user", produces = {MediaType.APPLICATION_JSON_VALUE},
+@RequestMapping(value = "auth", produces = {MediaType.APPLICATION_JSON_VALUE},
                 consumes = {MediaType.APPLICATION_JSON_VALUE})
-public class UserController {
+public class AuthenticationController {
+
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public AuthenticationController(UserService userService) {
         this.userService = userService;
     }
 
 
-
 }
-

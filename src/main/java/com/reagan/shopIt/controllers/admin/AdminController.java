@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/admin", produces = {MediaType.APPLICATION_JSON_VALUE},
+@RequestMapping(value = "admin", produces = {MediaType.APPLICATION_JSON_VALUE},
                 consumes = {MediaType.APPLICATION_JSON_VALUE})
 @PreAuthorize("hasRole('Administrator')")
 public class AdminController {

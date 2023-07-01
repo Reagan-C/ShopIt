@@ -49,7 +49,8 @@ public class SecurityConfig {
                     .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(auth ->
-                            auth.requestMatchers("/api/v1/items/***").permitAll()
+                            auth.requestMatchers("/api/v1/auth/sign-up").permitAll()
+                                .requestMatchers("/api/v1/auth/sign-in").permitAll()
                                 .requestMatchers("/api/v1/test/***").permitAll()
                                 .anyRequest().authenticated()
                     );
