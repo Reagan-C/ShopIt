@@ -5,7 +5,6 @@ import com.reagan.shopIt.model.domain.*;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
 import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
-import com.reagan.shopIt.model.dto.onetimepassword.TokenDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import com.reagan.shopIt.model.enums.UserRoleType;
 import com.reagan.shopIt.model.exception.*;
@@ -96,7 +95,7 @@ public class UserServiceImpl implements UserService {
         newUser.addRegularRole(roleRepository.findByTitle(UserRoleType.REGULAR.getValue()));
 
         //check if country exists and assign to user
-        Country country = countryRepository.findByTitle(body.getNationality());
+        Country country = countryRepository.findByTitle(body.getCountry());
         if (country != null) {
             newUser.setCountry(country);
         } else {
@@ -127,11 +126,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> confirmSignUpToken(TokenDTO token) {
+    public ResponseEntity<String> confirmSignUpToken(String token) {
         User user1;
 
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(token.getName())
+        AuthToken confirmationToken = otpRepository.findByToken(token)
                 .orElseThrow(InvalidOtpException::new);
 
         //check if token is already confirmed
@@ -169,8 +168,8 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException("Username or Password incorrect");
         }
         UserDetails userDetails = userDetailsService.loadUserByUsername(body.getEmailAddress());
-
-        return ResponseEntity.ok().body("Login Successful");
+        String jwt =  tokenProvider.generateJwtToken(body.getEmailAddress());
+        return ResponseEntity.ok().body(jwt);
     }
 
     @Override
@@ -181,10 +180,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String sendChangePasswordOtp(ForgotPasswordDTO forgotPasswordDTO) {
-        User user = userRepository.findByEmailAddress(forgotPasswordDTO.getEmailAddress());
+    public String sendChangePasswordOtp(String email) {
+        User user = userRepository.findByEmailAddress(email);
         if (user == null) {
-            throw new UserNameNotFoundException(forgotPasswordDTO.getEmailAddress());
+            throw new UserNameNotFoundException(email);
         }
         //Generate otp and send to user
         String token = generator.createPasswordResetToken();
@@ -196,7 +195,7 @@ public class UserServiceImpl implements UserService {
         authToken.setConfirmedAt(null);
 
         otpRepository.save(authToken);
-        emailService.sendChangePasswordMail(forgotPasswordDTO.getEmailAddress(), token);
+        emailService.sendChangePasswordMail(email, token);
 
         return "Please check your Email for otp";
     }
@@ -241,23 +240,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public ResponseEntity<String> updateUser(UpdateUserDTO updateUserDTO) {
-       boolean userExists = userRepository.existsByEmailAddress(updateUserDTO.getEmailAddress());
+    public ResponseEntity<String> updateUser(Long id, UpdateUserDTO updateUserDTO) {
+       boolean userExists = userRepository.existsById(id);
        if (!userExists) {
            throw new UserNameNotFoundException(updateUserDTO.getFirstName()+ " " + updateUserDTO.getLastName());
        }
-       User user =
+
        userRepository.updateUser(updateUserDTO.getFirstName(), updateUserDTO.getLastName(),
                updateUserDTO.getAddress(), updateUserDTO.getCity(), updateUserDTO.getState(),
-               updateUserDTO.getNationality(), updateUserDTO.getPhoneNumber(), updateUserDTO.getEmailAddress());
-        return ResponseEntity.ok("Hello " + user.getFirstName() + ", Your update operation is successful");
+               updateUserDTO.getCountry(), updateUserDTO.getPhoneNumber(), id);
+        return ResponseEntity.ok("Hello " + updateUserDTO.getFirstName() + ", Your update operation is successful");
     }
 
     @Override
-    public ResponseEntity<User> findUserByEmail(EmailAddressDTO emailAddressDTO) {
-         User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
+    public ResponseEntity<User> findUserByEmail(String email) {
+         User user = userRepository.findByEmailAddress(email);
          if (user == null) {
-             throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
+             throw new UserNameNotFoundException(email);
          }
          return ResponseEntity.ok(user);
     }
@@ -300,7 +299,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void RemoveItemFromCart(OrderCartItemsDTO removeItemDTO) {
+    public void removeItemFromCart(OrderCartItemsDTO removeItemDTO) {
         //check if user is valid
         User newUser = userRepository.findByEmailAddress(removeItemDTO.getEmailAddress());
         if (newUser == null) {

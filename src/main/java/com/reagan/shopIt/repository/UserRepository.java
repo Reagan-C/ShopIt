@@ -23,11 +23,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmailAddress(String emailAddress);
 
+    boolean existsById(Long id);
+
     @Modifying
     @Query(value = "update User u set u.firstName = ?1, u.lastName = ?2, u.address = ?3, u.city = ?4, u.country = ?5, "+
-            "u.phoneNumber = ?6 where u.emailAddress = ?7", nativeQuery = true)
+            "u.phoneNumber = ?6 where u.id = ?7", nativeQuery = true)
     User updateUser(String firstName, String lastName, String address, String city, String state, Country country,
-                    String phoneNumber, String emailAddress);
+                    String phoneNumber, Long id);
 
     @Query(value = "select u from User u order by u.id desc", nativeQuery = true)
     List<User> getAllUsers();

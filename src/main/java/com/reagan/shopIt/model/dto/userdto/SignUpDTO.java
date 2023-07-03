@@ -6,7 +6,6 @@ import com.reagan.shopIt.annotations.DateOfBirth;
 import com.reagan.shopIt.annotations.EqualPassword;
 import com.reagan.shopIt.annotations.PasswordNotOtherUserFields;
 import com.reagan.shopIt.annotations.PhoneNumber;
-import com.reagan.shopIt.model.domain.Country;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -72,6 +71,6 @@ public class SignUpDTO implements Serializable {
 
     @JsonProperty("nationality_id")
     @NotBlank(message = "{user.country.notBlank}")
-    private String nationality;
+    private String country;
 
 }

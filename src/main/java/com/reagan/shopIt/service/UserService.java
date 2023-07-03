@@ -5,7 +5,6 @@ import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
 import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
-import com.reagan.shopIt.model.dto.onetimepassword.TokenDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
@@ -19,21 +18,21 @@ public interface UserService {
     ResponseEntity<String> register(SignUpDTO body);
 
     @Transactional
-    ResponseEntity<String> confirmSignUpToken(TokenDTO token);
+    ResponseEntity<String> confirmSignUpToken(String token);
 
     ResponseEntity<String> authenticate(SignInDTO body);
 
     ResponseEntity<?> signOut();
 
-    String sendChangePasswordOtp(ForgotPasswordDTO email);
+    String sendChangePasswordOtp(String email);
 
     @Transactional
     ResponseEntity<String> changePassword(ResetPasswordDTO resetPasswordDTO);
 
     @Transactional
-    ResponseEntity<String> updateUser(UpdateUserDTO updateUserDTO);
+    ResponseEntity<String> updateUser(Long id, UpdateUserDTO updateUserDTO);
 
-    ResponseEntity<User> findUserByEmail(EmailAddressDTO emailAddressDTO);
+    ResponseEntity<User> findUserByEmail(String email);
 
     List<User> findAllUsers();
 
@@ -41,7 +40,7 @@ public interface UserService {
     void addItemToCart(AddCartItemsDTO itemName);
 
     @Transactional
-    void RemoveItemFromCart(OrderCartItemsDTO itemName);
+    void removeItemFromCart(OrderCartItemsDTO itemName);
 
     ResponseEntity<String> placeOrder(EmailAddressDTO emailAddressDTO);
 
