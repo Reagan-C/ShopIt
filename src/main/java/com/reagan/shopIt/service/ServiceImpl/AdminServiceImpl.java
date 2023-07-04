@@ -2,6 +2,7 @@ package com.reagan.shopIt.service.ServiceImpl;
 
 import com.reagan.shopIt.model.domain.Admin;
 import com.reagan.shopIt.model.domain.User;
+import com.reagan.shopIt.model.domain.UserRole;
 import com.reagan.shopIt.model.dto.admindto.AdminDTO;
 import com.reagan.shopIt.model.enums.UserRoleType;
 import com.reagan.shopIt.model.exception.UserNameNotFoundException;
@@ -16,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -54,7 +56,8 @@ public class AdminServiceImpl implements AdminService {
         admin.setUserLastName(user.getLastName());
 
         //assign admin role to user
-        user.addAdminRole(roleRepository.findByTitle(UserRoleType.ADMINISTRATOR.getValue()));
+        Optional<UserRole> roles = roleRepository.findByTitle(UserRoleType.ADMINISTRATOR.getValue());
+        roles.ifPresent(user::addAdminRole);
 
         //save and persist admin and user
         userRepository.save(user);
@@ -80,7 +83,8 @@ public class AdminServiceImpl implements AdminService {
         }
         //Remove from admins
         adminRepository.delete(admin);
-        user.removeFromAdmin(roleRepository.findByTitle(UserRoleType.ADMINISTRATOR.getValue()));
+        Optional<UserRole> role = roleRepository.findByTitle(UserRoleType.ADMINISTRATOR.getValue());
+        role.ifPresent(user::removeFromAdmin);
 
         //Save user
         userRepository.save(user);

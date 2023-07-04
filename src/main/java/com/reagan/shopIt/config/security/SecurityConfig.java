@@ -3,9 +3,11 @@ package com.reagan.shopIt.config.security;
 import com.reagan.shopIt.config.filter.JwtAuthenticationFilter;
 import com.reagan.shopIt.config.security.jwt.JwtAuthenticationEntryPoint;
 import com.reagan.shopIt.config.security.jwt.JwtAuthenticationProvider;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -49,10 +51,10 @@ public class SecurityConfig {
                     .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(auth ->
-                            auth.requestMatchers("/api/v1/auth/register").permitAll()
-                                .requestMatchers("/api/v1/auth/log-in").permitAll()
-                                .requestMatchers("/api/v1/test/***").permitAll()
-                                .anyRequest().authenticated()
+                            auth.requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/api/v1/auth/log-in").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/test/***").permitAll()
+                                .anyRequest().permitAll()
                     );
             http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -64,6 +66,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
+    }
 
     @Bean
     public AuthenticationManager authenticationManagerBean(HttpSecurity http) throws Exception {

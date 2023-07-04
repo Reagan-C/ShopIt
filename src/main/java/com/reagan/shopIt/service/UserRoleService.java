@@ -10,8 +10,6 @@ import java.util.List;
 
 public interface UserRoleService {
 
-    void seedRoles() throws JsonProcessingException;
-
     ResponseEntity<?> addNewRole(UserRoleDTO userRoleDTO);
 
     ResponseEntity<?> updateRole(UpdateUserRoleDTO updateUserRoleDTO);

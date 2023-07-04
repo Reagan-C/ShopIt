@@ -23,10 +23,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RoleNotFoundException;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,6 +39,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
     private ModelMapper mapper;
 
     @Autowired
@@ -89,10 +89,15 @@ public class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException();
         }
 
+        Optional<UserRole> role = roleRepository.findByCode(UserRoleType.REGULAR.getValue());
+        if (role.isEmpty()) {
+            throw new UserRoleNotFoundException(UserRoleType.REGULAR.getValue());
+        }
+
         // create new user if user does not exist, encode password and set role as regular
         User newUser = mapper.map(body, User.class);
         newUser.setPassword(passwordEncoder.encode(body.getPassword()));
-        newUser.addRegularRole(roleRepository.findByTitle(UserRoleType.REGULAR.getValue()));
+        newUser.addRegularRole(role.get());
 
         //check if country exists and assign to user
         Country country = countryRepository.findByTitle(body.getCountry());
@@ -114,14 +119,14 @@ public class UserServiceImpl implements UserService {
         newUser.setAuthenticationToken(token);
 
         // create link,  calling the confirm token api
-        String link = "http://localhost:8080/api/v1/registration/confirm?token=" + token;
+        String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
 
         // Send email notification and save user and auth token
-        emailService.sendAccountConfirmationMail(newUser.getEmailAddress(),
-                emailService.buildEmail(newUser.getFirstName(), link));
+//        emailService.sendAccountConfirmationMail(body.getEmailAddress(),
+//                emailService.buildEmail(body.getFirstName(), link));
         userRepository.save(newUser);
         otpRepository.save(authToken);
-        return ResponseEntity.ok("Account created, Please log into your Email to confirm your account");
+        return ResponseEntity.ok("Account created, Please log into your Email to confirm your account "+ token);
     }
 
     @Override
@@ -150,7 +155,7 @@ public class UserServiceImpl implements UserService {
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         user1.setEnabled(true);
         user1.setAuthenticationToken(null);
-        emailService.sendWelcomeMessage(user1.getEmailAddress());
+//        emailService.sendWelcomeMessage(user1.getEmailAddress());
 
         userRepository.save(user1);
         otpRepository.save(confirmationToken);
@@ -464,4 +469,10 @@ public class UserServiceImpl implements UserService {
 
         return "Thank you for shopping with us!";
     }
+
+    public Set<UserRole> getUserRoles(EmailAddressDTO dto) {
+        User user1 = userRepository.findByEmailAddress(dto.getEmailAddress());
+        return user1.getRoles();
+    }
+
 }

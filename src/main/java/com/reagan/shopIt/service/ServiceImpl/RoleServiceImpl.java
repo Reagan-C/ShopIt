@@ -1,6 +1,5 @@
 package com.reagan.shopIt.service.ServiceImpl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.reagan.shopIt.model.domain.UserRole;
 import com.reagan.shopIt.model.dto.roledto.UpdateUserRoleDTO;
 import com.reagan.shopIt.model.dto.roledto.UserRoleDTO;
@@ -10,11 +9,9 @@ import com.reagan.shopIt.repository.RoleRepository;
 import com.reagan.shopIt.service.UserRoleService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Date;
 import java.util.List;
@@ -31,37 +28,10 @@ public class RoleServiceImpl implements UserRoleService {
     }
 
     @Override
-    @TransactionalEventListener(ApplicationReadyEvent.class)
-    public void seedRoles() throws JsonProcessingException {
-//        String userRolesAsString = readResourceFile("json/roles.json");
-//        ObjectMapper objectMapper = new ObjectMapper();
-//
-//        UserRole[] rolesArray = objectMapper.readValue(userRolesAsString, UserRole[].class);
-//        List<UserRole> roleList = Arrays.asList(rolesArray);
-//
-//        try {
-//            for (UserRole role : roleList) {
-//                if (false) {
-//                    Optional<UserRole> roleExists = roleRepository.findByTitleAndCode(role.getTitle(), role.getCode());
-//
-//                    if (roleExists.isPresent()) {
-//                        continue;
-//                    }
-//
-//                    role.setId(null);
-//                    roleRepository.save(role);
-//                }
-//            }
-//        }catch (UserRoleDuplicateEntityException e){
-//
-//        }
-    }
-
-    @Override
     @Transactional
     public ResponseEntity<?> addNewRole(UserRoleDTO userRoleDTO) {
-        UserRole role = roleRepository.findByTitle(userRoleDTO.getTitle());
-        if (role != null) {
+        Optional<UserRole> role = roleRepository.findByCode(userRoleDTO.getTitle());
+        if (role.isPresent()) {
             throw new UserRoleDuplicateEntityException();
         }
         //create new role if null
@@ -77,16 +47,16 @@ public class RoleServiceImpl implements UserRoleService {
     @Override
     @Transactional
     public ResponseEntity<?> updateRole(UpdateUserRoleDTO updateUserRoleDTO) {
-        UserRole userRole = roleRepository.findByTitle(updateUserRoleDTO.getOldTitle());
-        if (userRole == null) {
+        Optional<UserRole> userRole = roleRepository.findByTitle(updateUserRoleDTO.getOldTitle());
+        if (userRole.isEmpty()) {
             throw new UserRoleNotFoundException(updateUserRoleDTO.getOldTitle());
         }
-        userRole.setTitle(updateUserRoleDTO.getNewTitle());
-        userRole.setCode(updateUserRoleDTO.getCode());
-        userRole.setUpdatedOn(new Date());
+        userRole.get().setTitle(updateUserRoleDTO.getNewTitle());
+        userRole.get().setCode(updateUserRoleDTO.getCode());
+        userRole.get().setUpdatedOn(new Date());
 
         //save updated role
-        roleRepository.save(userRole);
+        roleRepository.save(userRole.get());
         return ResponseEntity.ok("Role updated successfully");
     }
 

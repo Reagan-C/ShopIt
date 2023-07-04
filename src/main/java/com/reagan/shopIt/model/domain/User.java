@@ -23,7 +23,7 @@ public class User {
     private Long id;
 
     @Column(name = "username")
-    private String username = this.getEmailAddress();
+    private String username;
 
     @Column(name = "email")
     private String emailAddress;
@@ -96,28 +96,28 @@ public class User {
     private Date updatedOn;
 
     public void addRegularRole(UserRole userRole) {
-        this.getRoles().add(userRole);
+        this.roles.add(userRole);
     }
 
     public void addAdminRole(UserRole userRole) {
-        this.getRoles().add(userRole);
+        this.roles.add(userRole);
     }
 
     public void removeFromAdmin(UserRole userRole) {
-        this.getRoles().remove(userRole);
+        this.roles.remove(userRole);
     }
 
 
     public void addPendingOrder(PendingOrder pendingOrder) {
-        this.getPendingOrders().add(pendingOrder);
+        this.pendingOrders.add(pendingOrder);
     }
 
     public void addFulfilledOrder(FulfilledOrders fulfilledOrder) {
-        this.getFulfilledOrders().add(fulfilledOrder);
+        this.fulfilledOrders.add(fulfilledOrder);
     }
 
     public void removeFromPendingOrder(PendingOrder pendingOrder) {
-        this.getPendingOrders().remove(pendingOrder);
+        this.pendingOrders.remove(pendingOrder);
     }
 
     public void resetUserCart() {

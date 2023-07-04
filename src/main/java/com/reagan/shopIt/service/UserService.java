@@ -2,6 +2,7 @@ package com.reagan.shopIt.service;
 
 import com.reagan.shopIt.model.domain.CartItem;
 import com.reagan.shopIt.model.domain.User;
+import com.reagan.shopIt.model.domain.UserRole;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
 import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
@@ -51,5 +52,5 @@ public interface UserService {
 
     Set<CartItem> viewItemsInCart(EmailAddressDTO emailAddressDTO);
 
-
+    Set<UserRole> getUserRoles(EmailAddressDTO dto);
 }

@@ -1,0 +1,20 @@
+ SELECT NOW();
+-- INSERT INTO roles(id, title, code, created_on, updated_on)
+--  VALUES
+--  (1, 'Administrator', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+--  (2, 'Regular', 'Regular', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ;
+--
+--  INSERT INTO category(id, category_name, abbreviation)
+--  VALUES
+--   (2,"Clothing and apparels", "CA"),
+--   (3, "Footwear and Shoes", "FS"),
+--   (4, "Electronics and Gadgets", "EG"),
+--   (5, "Games and Toys", "GT"),
+--   (6, "Sports Products", "SP"),
+--   (7, "Furniture", "F"),
+--   (8, "Medical Supplies", "MS"),
+--   (9, "Toys", "T");
+--
+--   INSERT INTO country (id,title,abbreviation, added_on, updated_on)
+--   VALUES
+--   (1, 'Nigeria', 'NGR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);

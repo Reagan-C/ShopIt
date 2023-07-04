@@ -1,5 +1,7 @@
 package com.reagan.shopIt.controllers.authentication;
 
+import com.reagan.shopIt.model.domain.UserRole;
+import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.model.dto.userdto.ResetPasswordDTO;
 import com.reagan.shopIt.model.dto.userdto.SignInDTO;
 import com.reagan.shopIt.model.dto.userdto.SignUpDTO;
@@ -9,8 +11,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
-@RequestMapping(value = "auth", produces = {MediaType.APPLICATION_JSON_VALUE},
+@RequestMapping(value = "/auth", produces = {MediaType.APPLICATION_JSON_VALUE},
                 consumes = {MediaType.APPLICATION_JSON_VALUE})
 public class AuthenticationController {
 
@@ -23,6 +27,11 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<String> create(@Validated @RequestBody SignUpDTO body) {
         return userService.register(body);
+    }
+
+    @GetMapping("/get-role")
+    public Set<UserRole> getUserRoles(@RequestBody EmailAddressDTO dto) {
+        return userService.getUserRoles(dto);
     }
 
     @GetMapping("/confirm")

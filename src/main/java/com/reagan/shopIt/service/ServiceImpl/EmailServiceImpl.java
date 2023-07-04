@@ -52,7 +52,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(environment.getProperty("shopIt.email"));
+            helper.setFrom("shopIt@gmail.com(NO REPLY)");
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -68,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(environment.getProperty("shopIt.email"));
+            helper.setFrom("shopIt@gmail.com(NO REPLY)");
             helper.setTo(emailAddress);
             helper.setSubject(subject);
             helper.setText(content, true);

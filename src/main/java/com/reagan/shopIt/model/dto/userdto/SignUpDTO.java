@@ -24,30 +24,28 @@ import java.util.Date;
 public class SignUpDTO implements Serializable {
 
     @JsonProperty("email")
-    @Email(message = "{user.email.valid}")
+    @Email(message = "Please enter a valid email address")
     private String emailAddress;
 
     @JsonProperty("password")
-    @NotBlank(message = "{user.password.notBlank}")
-    @Size(min = 8, message = "{user.password.size}")
-    @EqualPassword
-    @PasswordNotOtherUserFields
+    @NotBlank(message = "Password should be provided")
+    @Size(min = 8, message = "Your password should be at least 8 characters in length")
     private String password;
 
     @Transient
     private String confirmPassword;
 
     @JsonProperty("first_name")
-    @NotBlank(message = "{user.firstName.notBlank}")
+    @NotBlank(message = "First name should be provided")
     private String firstName;
 
     @JsonProperty("last_name")
-    @NotBlank(message = "{user.lastName.notBlank}")
+    @NotBlank(message = "Please fill your Lastname field")
     private String lastName;
 
     @JsonProperty("address")
-    @NotBlank(message = "{user.address.notBlank}")
-    @Size(min = 10, message = "{user.address.size}")
+    @NotBlank(message = "Address should be inputted")
+    @Size(min = 10, message = "Address size should be more than 10 characters")
     private String address;
 
     @JsonProperty("phone_number")
@@ -55,22 +53,19 @@ public class SignUpDTO implements Serializable {
     private String phoneNumber;
 
     @JsonProperty("city")
-    @NotBlank(message = "{user.city.notBlank}")
+    @NotBlank(message = "Please enter your city name")
     private String city;
 
     @JsonProperty("date_of_birth")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    @NotBlank(message = "{user.dateOfBirth.notBlank}")
-    @DateOfBirth
-    private Date dateOfBirth = new Date();
+    private Date dateOfBirth;
 
     @JsonProperty("state")
-    @NotBlank(message = "{user.state.notBlank}")
+    @NotBlank(message = "Please enter the name of your state")
     private String state;
 
-    @JsonProperty("nationality_id")
-    @NotBlank(message = "{user.country.notBlank}")
+    @NotBlank(message = "Please enter your country name")
     private String country;
 
 }

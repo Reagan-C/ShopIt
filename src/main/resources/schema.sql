@@ -120,6 +120,7 @@
         `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
         `cart_id` BIGINT,
         `country_id` BIGINT,
+
         PRIMARY KEY (`id`)
     );
 

@@ -4,13 +4,12 @@
 
 You shop in malls and you get tired of constantly going to the mall physically to buy items. You wish you can order for items. Here ShopIt steps in. With your internet enabled device, you just log and and select all the items you want and pay for them and your order will be delivered to you 
 
-**References**
-To be updated
+
 
 **Project Development Requirement**
 
 - Programming Language: Java
-- Runtime JDK 11
+- Runtime JDK 17
 - Database: MySQL
 - API Documentation: Postman 
 - SQL Viewer or GUI: MySQL Workbench
@@ -19,7 +18,7 @@ To be updated
 
 **Downloads and References**
 - [Enable Annotation Processing Lombok](https://www.google.com/search?q=enable+annotation+processing+lombok&oq=enab&aqs=chrome.0.69i59j69i57j69i59l2j0i433i512j46i433i512j69i65l2.1915j0j7&sourceid=chrome&ie=UTF-8)
-- [JDK 11](https://www.oracle.com/java/technologies/javase/jdk11-archive-downloads.html "JDK 11")
+- [JDK 17](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html "JDK 17")
 - [IntelliJ](https://www.jetbrains.com/idea/download/ "IntelliJ")
 - [Visual Studio Code](https://code.visualstudio.com/download "Visual Studio Code")
 - [MySQL Workbench](https://dev.mysql.com/downloads/workbench/ "Workbench")

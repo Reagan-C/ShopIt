@@ -11,8 +11,6 @@ import java.util.List;
 
 public interface CategoryService {
 
-    void seedCategory() throws JsonProcessingException;
-
     @Transactional
     ResponseEntity<?> addNewCategory(AddCategoryDTO addCategoryDTO);
 
