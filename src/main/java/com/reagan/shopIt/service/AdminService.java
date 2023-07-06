@@ -15,7 +15,7 @@ public interface AdminService {
     @Transactional
     ResponseEntity<?> removeUserFromAdmin(AdminDTO adminDTO);
 
-    List<?> getAllAdmins();
+    List<String> getAllAdmins();
 
     User findUser (AdminDTO adminDTO);
 }

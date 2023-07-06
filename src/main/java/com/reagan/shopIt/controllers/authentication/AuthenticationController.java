@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -30,7 +31,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/get-role")
-    public Set<UserRole> getUserRoles(@RequestBody EmailAddressDTO dto) {
+    public List<String> getUserRoles(@RequestBody EmailAddressDTO dto) {
         return userService.getUserRoles(dto);
     }
 

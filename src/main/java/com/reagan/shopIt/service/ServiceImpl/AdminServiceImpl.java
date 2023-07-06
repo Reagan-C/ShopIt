@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public ResponseEntity<?> addUserToAdmin(AdminDTO adminDTO) {
         //check if user exists by email address
-        User user = userRepository.findByUsername(adminDTO.getUserEmailAddress());
+        User user = userRepository.findByEmailAddress(adminDTO.getUserEmailAddress());
         if (user == null) {
             throw new UserNameNotFoundException(adminDTO.getUserEmailAddress());
         }
@@ -92,8 +93,17 @@ public class AdminServiceImpl implements AdminService {
         }
 
     @Override
-    public List<?> getAllAdmins() {
-        return adminRepository.findAll();
+    public List<String> getAllAdmins() {
+        List<String> admins= new ArrayList<>();
+        List<Admin> adminList = adminRepository.getAllAdmins();
+        if (!adminList.isEmpty()) {
+            for (Admin admin: adminList) {
+                admins.add(admin.getUserEmail());
+            }
+            return admins;
+        }
+        admins.add("rrrrrrrt");
+        return admins;
     }
 
     @Override

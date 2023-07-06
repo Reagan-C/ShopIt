@@ -23,7 +23,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -470,9 +469,14 @@ public class UserServiceImpl implements UserService {
         return "Thank you for shopping with us!";
     }
 
-    public Set<UserRole> getUserRoles(EmailAddressDTO dto) {
+    public List<String> getUserRoles(EmailAddressDTO dto) {
         User user1 = userRepository.findByEmailAddress(dto.getEmailAddress());
-        return user1.getRoles();
+        Set<UserRole> roles = user1.getRoles();
+        List<String> myRoles = new ArrayList<>();
+        for (UserRole role: roles) {
+           myRoles.add(role.getTitle());
+        }
+        return myRoles;
     }
 
 }
