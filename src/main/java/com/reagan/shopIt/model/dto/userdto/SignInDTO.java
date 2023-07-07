@@ -1,8 +1,6 @@
 package com.reagan.shopIt.model.dto.userdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.reagan.shopIt.annotations.EqualPassword;
-import com.reagan.shopIt.annotations.PasswordNotOtherUserFields;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

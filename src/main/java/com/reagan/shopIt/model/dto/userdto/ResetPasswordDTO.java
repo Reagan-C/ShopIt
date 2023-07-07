@@ -1,9 +1,7 @@
 package com.reagan.shopIt.model.dto.userdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.reagan.shopIt.annotations.EqualResetPassword;
-import com.reagan.shopIt.model.domain.AuthToken;
-import jakarta.persistence.Transient;
+import com.reagan.shopIt.annotations.EqualPassword;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -15,6 +13,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @Builder
+@EqualPassword(password = "password", confirmPassword = "confirmPassword")
 public class ResetPasswordDTO implements Serializable {
 
     @Email(message = "{user.email.valid}")
@@ -25,7 +24,6 @@ public class ResetPasswordDTO implements Serializable {
 
     @JsonProperty("password")
     @NotBlank(message = "{user.password.notBlank}")
-    @EqualResetPassword
     private String password;
 
     private String confirmPassword;

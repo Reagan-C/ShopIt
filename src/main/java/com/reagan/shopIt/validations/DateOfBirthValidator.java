@@ -8,7 +8,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.time.*;
 import java.util.Date;
 
-public class DateOfBirthValidator implements ConstraintValidator<DateOfBirth, SignUpDTO> {
+public class DateOfBirthValidator implements ConstraintValidator<DateOfBirth, Date> {
 
     @Override
     public void initialize(DateOfBirth constraintAnnotation) {
@@ -16,12 +16,12 @@ public class DateOfBirthValidator implements ConstraintValidator<DateOfBirth, Si
     }
 
     @Override
-    public boolean isValid(SignUpDTO signUpDTO, ConstraintValidatorContext constraintValidatorContext) {
-        Instant instant = signUpDTO.getDateOfBirth().toInstant();
+    public boolean isValid(Date dateOfBirth, ConstraintValidatorContext constraintValidatorContext) {
+        Instant instant = dateOfBirth.toInstant();
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
         LocalDate dob = zonedDateTime.toLocalDate();
-        Period period = Period.between(LocalDate.now(), dob);
-
+        Period period = Period.between(dob, LocalDate.now());
+        System.out.println(period.getYears());
         return  period.getYears() >= 18;
     }
 }

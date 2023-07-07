@@ -19,5 +19,6 @@ public @interface EqualPassword {
 
     Class<? extends Payload>[] payload() default {};
 
-
+    String password();
+    String confirmPassword();
 }
