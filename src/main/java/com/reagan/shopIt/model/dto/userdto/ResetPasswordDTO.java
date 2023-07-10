@@ -19,13 +19,14 @@ public class ResetPasswordDTO implements Serializable {
     @Email(message = "{user.email.valid}")
     private String emailAddress;
 
-    @NotBlank(message = "Please enter Otp sent to your email address")
+    @NotBlank(message = "{user.otp.notBlank}")
     private String otp;
 
     @JsonProperty("password")
     @NotBlank(message = "{user.password.notBlank}")
     private String password;
 
+    @NotBlank(message = "{user.password.notBlank}")
     private String confirmPassword;
 
 }

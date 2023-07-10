@@ -2,6 +2,7 @@ package com.reagan.shopIt.model.dto.itemdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -12,11 +13,11 @@ import lombok.*;
 @Builder
 public class UpdateItemDTO {
 
-    @JsonProperty("name")
+    @JsonProperty("item_old_name")
     @NotBlank(message = "{product.name.notBlank}")
-    private String itemName;
+    private String itemOldName;
 
-    @JsonProperty("name")
+    @JsonProperty("item_new_name")
     @NotBlank(message = "{product.name.notBlank}")
     private String itemNewName;
 
@@ -26,7 +27,7 @@ public class UpdateItemDTO {
     private String description;
 
     @JsonProperty("price")
-    @NotBlank(message = "{product.price.notBlank}")
+    @NotNull(message = "{product.price.notBlank}")
     private double price;
 
 }

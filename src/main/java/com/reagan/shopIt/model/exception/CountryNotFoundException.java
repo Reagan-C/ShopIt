@@ -13,6 +13,6 @@ public class CountryNotFoundException extends ShopItException{
     @Override
     public String getMessage() {
         return String.format("%s with this title  %s cannot be found",
-                ENTITY_NAME, countryTitle.toString());
+                ENTITY_NAME, countryTitle);
     }
 }

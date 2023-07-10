@@ -12,7 +12,7 @@ import lombok.*;
 public class ConfirmOrderDTO {
 
     @JsonProperty("otp")
-    @NotBlank(message = "Please enter otp")
+    @NotBlank(message = "{user.otp.notBlank}")
     private String token;
 
 }

@@ -34,7 +34,7 @@ public class ItemController {
 //    }
 //
     @PutMapping("/update")
-    public ResponseEntity<Item> updateItem(@Validated @RequestBody UpdateItemDTO updateItemDTO) {
+    public ResponseEntity<?> updateItem(@Validated @RequestBody UpdateItemDTO updateItemDTO) {
         return ResponseEntity.ok(itemService.updateItem(updateItemDTO));
     }
 

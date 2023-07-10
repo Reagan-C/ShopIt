@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class AddCartItemsDTO {
 
 
-    @NotBlank(message = "Please populate email address field")
+    @NotBlank(message = "{user.email.valid}")
     private String emailAddress;
     @JsonProperty("cart_item")
     @NotBlank(message = "{cartItem.notBlank}")

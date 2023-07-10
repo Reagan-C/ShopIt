@@ -10,9 +10,9 @@ import lombok.*;
 @Builder
 public class OrderCartItemsDTO {
 
-    @NotBlank(message = "Please enter email address")
+    @NotBlank(message = "{user.email.valid}")
     private String emailAddress;
 
-    @NotBlank(message = "Please enter name of item to remove")
+    @NotBlank(message = "{product.name.notBlank}")
     private  String name;
 }

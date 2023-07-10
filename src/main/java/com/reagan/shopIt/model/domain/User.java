@@ -103,10 +103,13 @@ public class User {
         this.roles.add(userRole);
     }
 
+    public void removeUserRoles() {
+        this.roles = new HashSet<>();
+    }
+
     public void removeFromAdmin(UserRole userRole) {
         this.roles.remove(userRole);
     }
-
 
     public void addPendingOrder(PendingOrder pendingOrder) {
         this.pendingOrders.add(pendingOrder);

@@ -13,12 +13,12 @@ import com.reagan.shopIt.service.EmailService;
 import com.reagan.shopIt.service.UserService;
 import com.reagan.shopIt.util.OTPGenerator;
 import jakarta.transaction.Transactional;
+import org.joda.time.Days;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -83,28 +83,21 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseEntity<String> register(SignUpDTO body) {
+        //check if country exists
+        Country country = countryRepository.findByTitle(body.getCountry());
+        if (country == null) {
+            throw new CountryNotFoundException(body.getCountry());
+        }
+        //check if user already exists in record
         boolean existingUser = userRepository.existsByEmailAddress(body.getEmailAddress());
         if (existingUser) {
             throw new UserAlreadyExistsException();
         }
-
-        Optional<UserRole> role = roleRepository.findByCode(UserRoleType.REGULAR.getValue());
-        if (role.isEmpty()) {
-            throw new UserRoleNotFoundException(UserRoleType.REGULAR.getValue());
-        }
-
-        // create new user if user does not exist, encode password and set role as regular
+        // create new user if user does not exist,then encode password and set country
         User newUser = mapper.map(body, User.class);
+        newUser.setUsername(body.getEmailAddress());
         newUser.setPassword(passwordEncoder.encode(body.getPassword()));
-        newUser.addRegularRole(role.get());
-
-        //check if country exists and assign to user
-        Country country = countryRepository.findByTitle(body.getCountry());
-        if (country != null) {
-            newUser.setCountry(country);
-        } else {
-            throw new IllegalArgumentException("Country doesn't exist by this title");
-        }
+        newUser.setCountry(country);
 
         //Generate and save confirmation token to AuthToken class. also set user auth token to token
         String token = generator.createVerificationToken();
@@ -125,32 +118,36 @@ public class UserServiceImpl implements UserService {
 //                emailService.buildEmail(body.getFirstName(), link));
         userRepository.save(newUser);
         otpRepository.save(authToken);
-        return ResponseEntity.ok("Account created, Please log into your Email to confirm your account "+ token);
+        return ResponseEntity.ok("Account created, Please log into your Email to confirm your account ");
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> confirmSignUpToken(String token) {
+    public ResponseEntity<String> confirmSignUpToken(UUID token) {
         User user1;
-
-        //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(token)
+        //check if token exists and get user if true
+        AuthToken confirmationToken = otpRepository.findByToken(token.toString())
                 .orElseThrow(InvalidOtpException::new);
 
+        user1 = confirmationToken.getUser();
         //check if token is already confirmed
         if (confirmationToken.getConfirmedAt() != null) {
             throw new ConfirmedOtpException();
         }
-
-        //check if token has expired, and remove user if not enabled
+        //check if token has expired, and remove user if true
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
-        user1 = userRepository.findByEmailAddress(confirmationToken.getUser().getEmailAddress());
-        if (expiredAt.isBefore(LocalDateTime.now()) && user1.getEnabled().equals(false)) {
-            userRepository.delete(user1);
-            throw new ExpiredOtpException();
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            user1.setCountry(null);
+            otpRepository.delete(confirmationToken);
+            return  ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Your OTP has expired");
         }
 
-        //if valid, set confirmed at. Also set user enabled to true and send welcome mail and clear token in user
+        //if valid, set confirmed at, assign role and set user enabled to true and send welcome mail
+        Optional<UserRole> role = roleRepository.findByCode(UserRoleType.REGULAR.getValue());
+        if (role.isEmpty()) {
+            throw new UserRoleNotFoundException(UserRoleType.REGULAR.getValue());
+        }
+        user1.addRegularRole(role.get());
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         user1.setEnabled(true);
         user1.setAuthenticationToken(null);
@@ -169,11 +166,11 @@ public class UserServiceImpl implements UserService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getEmailAddress(),
                     body.getPassword()));
         } catch (Exception e) {
-            throw new IllegalArgumentException("Username or Password incorrect");
+            throw e;
         }
-        UserDetails userDetails = userDetailsService.loadUserByUsername(body.getEmailAddress());
         String jwt =  tokenProvider.generateJwtToken(body.getEmailAddress());
-        return ResponseEntity.ok().body(jwt);
+        System.out.println("successful");
+        return ResponseEntity.ok().body("Login successful " + jwt);
     }
 
     @Override
@@ -189,6 +186,11 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNameNotFoundException(email);
         }
+        //check if user performed update in the last 7 days and throw exception if true
+        Days daysDifference  = Days.days(user.getUpdatedOn().compareTo(new Date()));
+        if (daysDifference.isLessThan(Days.days(7))) {
+            throw new InsufficientDaysBeforeUpdateException();
+        }
         //Generate otp and send to user
         String token = generator.createPasswordResetToken();
         AuthToken authToken = new AuthToken();
@@ -199,8 +201,7 @@ public class UserServiceImpl implements UserService {
         authToken.setConfirmedAt(null);
 
         otpRepository.save(authToken);
-        emailService.sendChangePasswordMail(email, token);
-
+//        emailService.sendChangePasswordMail(email, token);
         return "Please check your Email for otp";
     }
 
@@ -213,65 +214,106 @@ public class UserServiceImpl implements UserService {
         if (existingUser == null) {
             throw new UserNameNotFoundException(resetPasswordDTO.getEmailAddress());
         }
-        // check if new password is same as existing password
-        if (existingUser.getPassword().equals(passwordEncoder.encode(resetPasswordDTO.getPassword()))) {
-            throw new IllegalArgumentException("New password cannot be same with old password");
-        }
         //check if token exists
         AuthToken confirmationToken = otpRepository.findByToken(resetPasswordDTO.getOtp())
                 .orElseThrow(InvalidOtpException::new);
-
         //check if token is already confirmed
         if (confirmationToken.getConfirmedAt() != null) {
-            throw new ConfirmedOtpException();
+            throw new ConfirmedPasswordChangeOtpException();
         }
         //check if token has expired
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
         if (expiredAt.isBefore(LocalDateTime.now())) {
             throw new ExpiredOtpException();
         }
+        // check if new password is same as existing password
+        if (existingUser.getPassword().equals(passwordEncoder.encode(resetPasswordDTO.getPassword()))) {
+            throw new IllegalArgumentException("New password cannot be same with old password");
+        }
         //if token is valid, set confirmed at.
         confirmationToken.setConfirmedAt(LocalDateTime.now());
-        //set new existing user password
+        //set new user password
         existingUser.setPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
 
         userRepository.save(existingUser);
         otpRepository.save(confirmationToken);
         //send email to user
-        emailService.sendSuccessfulPasswordChangeMail(resetPasswordDTO.getEmailAddress());
+//        emailService.sendSuccessfulPasswordChangeMail(resetPasswordDTO.getEmailAddress());
         return ResponseEntity.ok("Password change successful");
     }
 
     @Override
     @Transactional
     public ResponseEntity<String> updateUser(Long id, UpdateUserDTO updateUserDTO) {
+        //check if user exists by id
        boolean userExists = userRepository.existsById(id);
        if (!userExists) {
-           throw new UserNameNotFoundException(updateUserDTO.getFirstName()+ " " + updateUserDTO.getLastName());
+           throw new UserIDNotFoundException(id);
        }
+        //check if country exists
+        Country country = countryRepository.findByTitle(updateUserDTO.getCountry());
+        if (country == null) {
+            throw new CountryNotFoundException(updateUserDTO.getCountry());
+        }
 
        userRepository.updateUser(updateUserDTO.getFirstName(), updateUserDTO.getLastName(),
                updateUserDTO.getAddress(), updateUserDTO.getCity(), updateUserDTO.getState(),
-               updateUserDTO.getCountry(), updateUserDTO.getPhoneNumber(), id);
+               country.getId(), updateUserDTO.getPhoneNumber(), id);
         return ResponseEntity.ok("Hello " + updateUserDTO.getFirstName() + ", Your update operation is successful");
     }
 
     @Override
-    public ResponseEntity<User> findUserByEmail(String email) {
-         User user = userRepository.findByEmailAddress(email);
+    public Map<String, Object> findUserByEmail(EmailAddressDTO email) {
+        Map<String, Object> userDetails = new LinkedHashMap<>();
+         User user = userRepository.findByEmailAddress(email.getEmailAddress());
          if (user == null) {
-             throw new UserNameNotFoundException(email);
+             throw new UserNameNotFoundException(email.getEmailAddress());
          }
-         return ResponseEntity.ok(user);
+         userDetails.put("ID:", user.getId());
+         userDetails.put("Username:", user.getUsername());
+         userDetails.put("Firstname:", user.getFirstName());
+         userDetails.put("Lastname:", user.getLastName());
+         userDetails.put("Address:", user.getAddress());
+         userDetails.put("Date of birth:", user.getDateOfBirth());
+         userDetails.put("City", user.getCity());
+         userDetails.put("State", user.getState());
+         userDetails.put("Country", user.getCountry().getTitle());
+         userDetails.put("Fulfilled Orders", user.getFulfilledOrders());
+         userDetails.put("Created account on", user.getCreatedOn().toString());
+         userDetails.put("Last updated account on", user.getUpdatedOn().toString());
+         return userDetails;
     }
 
     @Override
-    public List<User> findAllUsers() {
-        List<User> allUsers = userRepository.getAllUsers();
-        if (allUsers.isEmpty()) {
+    public List<Map<String, Object>> findAllUsers() {
+        //create list for adding object of type map
+        List<Map<String, Object>> finalListOfUsers = new ArrayList<>();
+        //query database to get all users
+        List<User> listOfUsers = userRepository.getAllUsers();
+        if (listOfUsers.isEmpty()) {
             throw new RuntimeException("No user saved yet");
         }
-        return allUsers;
+        //Loop through the list of all users, and extract needed details into a map
+        for (User user : listOfUsers) {
+            Map<String, Object> userDetail = new LinkedHashMap<>();
+
+            userDetail.put("ID:", user.getId());
+            userDetail.put("Username:", user.getUsername());
+            userDetail.put("Firstname:", user.getFirstName());
+            userDetail.put("Lastname:", user.getLastName());
+            userDetail.put("Address:", user.getAddress());
+            userDetail.put("Date of birth:", user.getDateOfBirth());
+            userDetail.put("City", user.getCity());
+            userDetail.put("State", user.getState());
+            userDetail.put("Country", user.getCountry().getTitle());
+            userDetail.put("Fulfilled Orders", user.getFulfilledOrders());
+            userDetail.put("Created account on", user.getCreatedOn().toString());
+            userDetail.put("Last updated account on", user.getUpdatedOn().toString());
+
+            // add the extracted details into the map to be returned
+            finalListOfUsers.add(userDetail);
+        }
+        return finalListOfUsers;
     }
 
     @Override
@@ -471,12 +513,32 @@ public class UserServiceImpl implements UserService {
 
     public List<String> getUserRoles(EmailAddressDTO dto) {
         User user1 = userRepository.findByEmailAddress(dto.getEmailAddress());
+        if (user1 == null) {
+            throw new UserNameNotFoundException(dto.getEmailAddress());
+        }
         Set<UserRole> roles = user1.getRoles();
         List<String> myRoles = new ArrayList<>();
         for (UserRole role: roles) {
            myRoles.add(role.getTitle());
         }
         return myRoles;
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<?> removeUser(EmailAddressDTO emailAddressDTO) {
+        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
+        if (user == null) {
+            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
+        }
+        AuthToken authToken = otpRepository.findByUser(user);
+        if (authToken != null) {
+            user.setCountry(null);
+            user.removeUserRoles();
+            otpRepository.delete(authToken);
+            return ResponseEntity.ok("Account deletion successful");
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failure encountered during deletion");
     }
 
 }

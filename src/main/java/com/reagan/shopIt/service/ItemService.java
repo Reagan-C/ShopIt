@@ -16,7 +16,7 @@ public interface ItemService {
     ResponseEntity<?> removeItem(DeleteItemDTO itemDTO);
 
     @Transactional
-    Item updateItem(UpdateItemDTO updateItemDTO);
+    ResponseEntity<?> updateItem(UpdateItemDTO updateItemDTO);
 
     @Transactional
     ResponseEntity<Item> setItemQuantity(SetItemQuantityDTO quantityDTO);

@@ -10,7 +10,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public interface UserService {
 
@@ -18,7 +20,7 @@ public interface UserService {
     ResponseEntity<String> register(SignUpDTO body);
 
     @Transactional
-    ResponseEntity<String> confirmSignUpToken(String token);
+    ResponseEntity<String> confirmSignUpToken(UUID token);
 
     ResponseEntity<String> authenticate(SignInDTO body);
 
@@ -32,9 +34,9 @@ public interface UserService {
     @Transactional
     ResponseEntity<String> updateUser(Long id, UpdateUserDTO updateUserDTO);
 
-    ResponseEntity<User> findUserByEmail(String email);
+    Map<String, Object> findUserByEmail(EmailAddressDTO email);
 
-    List<User> findAllUsers();
+    List<Map<String, Object>> findAllUsers();
 
     @Transactional
     void addItemToCart(AddCartItemsDTO itemName);
@@ -52,4 +54,7 @@ public interface UserService {
     Set<CartItem> viewItemsInCart(EmailAddressDTO emailAddressDTO);
 
     List<String> getUserRoles(EmailAddressDTO dto);
+
+    @Transactional
+    ResponseEntity<?> removeUser(EmailAddressDTO emailAddressDTO);
 }

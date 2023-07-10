@@ -19,4 +19,5 @@ public interface RoleRepository extends JpaRepository<UserRole, Long> {
     Optional<UserRole> findByTitle(String code);
 
     Optional<UserRole> findByCode(String code);
+
 }

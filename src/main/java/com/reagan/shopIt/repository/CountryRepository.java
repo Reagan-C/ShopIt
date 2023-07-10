@@ -18,4 +18,5 @@ public interface CountryRepository extends JpaRepository<Country, Long> {
 
     Country findByTitle(String nationality);
 
+
 }

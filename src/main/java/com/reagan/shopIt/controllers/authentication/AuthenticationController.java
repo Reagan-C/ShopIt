@@ -1,6 +1,5 @@
 package com.reagan.shopIt.controllers.authentication;
 
-import com.reagan.shopIt.model.domain.UserRole;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.model.dto.userdto.ResetPasswordDTO;
 import com.reagan.shopIt.model.dto.userdto.SignInDTO;
@@ -12,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/auth", produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -36,7 +35,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/confirm")
-    public ResponseEntity<String> confirmSignUp(@RequestParam("token") String token) {
+    public ResponseEntity<String> confirmSignUp(@RequestParam("token") UUID token) {
         return userService.confirmSignUpToken(token);
     }
 

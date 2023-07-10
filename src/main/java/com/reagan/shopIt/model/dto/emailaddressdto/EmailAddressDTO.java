@@ -1,6 +1,7 @@
 package com.reagan.shopIt.model.dto.emailaddressdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -12,7 +13,7 @@ import lombok.*;
 public class EmailAddressDTO {
 
     @JsonProperty("emailAddress")
-    @NotBlank(message = "Please enter your email address")
+    @Email(message = "{user.email.valid}")
     private String emailAddress;
 
 }

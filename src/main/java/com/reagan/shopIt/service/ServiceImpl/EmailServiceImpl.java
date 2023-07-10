@@ -26,7 +26,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private final UserRepository userRepository;
 
-    private Environment environment;
 
     public EmailServiceImpl(JavaMailSender mailSender, UserRepository userRepository) {
         this.mailSender = mailSender;
@@ -86,8 +85,8 @@ public class EmailServiceImpl implements EmailService {
                 "flex;border-bottom:1px solid #eee;font-size:1.2em;\"><a href=\"\" style=\"margin-right: 5px;" +
                 "color: #00466a;text-decoration:none;font-weight:600\"><img style=\"height:55px; width:55px\" " +
                 "src=\"\" /></a><p>ShopIt</p></div><p style=\"font-size:1.1em\">" + "Dear " +
-                user.getFirstName() + ", <br>" + "Your password reset code is " + otp + " and it is valid for \""
-                + environment.getProperty("shopIt.otp.expiration")  + "\" <hr style=\"border:none;border-top:" +
+                user.getFirstName() + ", <br>" + "Your password reset code is " + otp + " and it is valid for 20 minutes\""
+                 + "\" <hr style=\"border:none;border-top:" +
                 "1px solid #eee\" />" + "<div style=\"margin-top: 20px;padding" +
                 ":8px 0;color:#aaa;font-size:1.0em;line-height:1;font-weight:300\">" +
                 " <p>© 2023 ShopIt, All rights reserved.</p>" +
@@ -98,7 +97,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(environment.getProperty("shopIt.email"));
+            helper.setFrom("shopIt@gmail.com");
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -126,7 +125,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(environment.getProperty("shopIt.email"));
+            helper.setFrom("shopIt@gmail.com");
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -157,7 +156,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(environment.getProperty("shopIt.email"));
+            helper.setFrom("shopIt@gmail.com");
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(content, true);
@@ -177,7 +176,7 @@ public class EmailServiceImpl implements EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(environment.getProperty("shopIt.email"));
+            helper.setFrom("shopIt@gmail.com");
             helper.setTo(email);
             helper.setSubject(subject);
             helper.setText(content, true);

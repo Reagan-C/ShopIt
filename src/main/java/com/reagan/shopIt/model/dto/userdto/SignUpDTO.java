@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.reagan.shopIt.annotations.DateOfBirth;
 import com.reagan.shopIt.annotations.EqualPassword;
 import com.reagan.shopIt.annotations.PhoneNumber;
+import com.reagan.shopIt.annotations.ValidDate;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -24,28 +26,28 @@ import java.util.Date;
 public class SignUpDTO implements Serializable {
 
     @JsonProperty("email")
-    @Email(message = "Please enter a valid email address")
+    @Email(message = "{user.email.valid}")
     private String emailAddress;
 
     @JsonProperty("password")
-    @NotBlank(message = "Password should be provided")
-    @Size(min = 8, message = "Your password should be at least 8 characters in length")
+    @NotBlank(message = "{user.password.notBlank}")
+    @Size(min = 8, message = "{user.password.size}")
     private String password;
 
     @Transient
     private String confirmPassword;
 
     @JsonProperty("first_name")
-    @NotBlank(message = "First name should be provided")
+    @NotBlank(message = "{user.firstName.notBlank}")
     private String firstName;
 
     @JsonProperty("last_name")
-    @NotBlank(message = "Please fill your Lastname field")
+    @NotBlank(message = "{user.lastName.notBlank}")
     private String lastName;
 
     @JsonProperty("address")
-    @NotBlank(message = "Address should be inputted")
-    @Size(min = 10, message = "Address size should be more than 10 characters")
+    @NotBlank(message = "{user.address.notBlank}")
+    @Size(min = 10, message = "{user.address.size}")
     private String address;
 
     @JsonProperty("phone_number")
@@ -53,7 +55,7 @@ public class SignUpDTO implements Serializable {
     private String phoneNumber;
 
     @JsonProperty("city")
-    @NotBlank(message = "Please enter your city name")
+    @NotBlank(message = "{user.city.notBlank}")
     private String city;
 
     @JsonProperty("date_of_birth")
@@ -66,7 +68,7 @@ public class SignUpDTO implements Serializable {
     @NotBlank(message = "{user.state.notBlank}")
     private String state;
 
-    @NotBlank(message = "Please enter your country name")
+    @NotBlank(message = "{user.country.notBlank}")
     private String country;
 
 }

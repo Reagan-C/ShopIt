@@ -37,9 +37,9 @@ public class UpdateUserDTO implements Serializable {
     @NotBlank(message = "{user.state.notBlank}")
     private String state;
 
-    @JsonProperty("nationality_id")
+    @JsonProperty("country")
     @NotBlank(message = "{user.country.notBlank}")
-    private Country country;
+    private String country;
 
     @JsonProperty("phone_number")
     @PhoneNumber

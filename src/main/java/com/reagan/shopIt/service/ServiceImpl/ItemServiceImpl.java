@@ -66,16 +66,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateItem(UpdateItemDTO updateItemDTO) {
-        Item item = itemRepository.findByName(updateItemDTO.getItemName());
+    public ResponseEntity<?> updateItem(UpdateItemDTO updateItemDTO) {
+        Item item = itemRepository.findByName(updateItemDTO.getItemOldName());
         if (item == null) {
-            throw  new ItemNotFoundException(updateItemDTO.getItemName());
+            throw  new ItemNotFoundException(updateItemDTO.getItemOldName());
         }
+        System.out.println(item.getName());
         item.setDescription(updateItemDTO.getDescription());
         item.setPrice(updateItemDTO.getPrice());
         item.setName(updateItemDTO.getItemNewName());
         itemRepository.save(item);
-        return item;
+        return ResponseEntity.ok("Item updated");
     }
 
     @Override

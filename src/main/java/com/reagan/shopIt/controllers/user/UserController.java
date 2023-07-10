@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -34,13 +35,13 @@ public class UserController {
 
     @PreAuthorize("hasRole('Administrator')")
     @GetMapping("/find-user-by-email-address")
-    public ResponseEntity<User> findUserByEmail(@RequestParam("email") String email) {
+    public Map<String, Object> findUserByEmail(@RequestBody @Validated EmailAddressDTO email) {
         return userService.findUserByEmail(email);
     }
 
     @PreAuthorize("hasRole('Administrator')")
     @GetMapping("/get-all-users")
-    public List<User> getAllUsers() {
+    public List<Map<String, Object>> getAllUsers() {
         return userService.findAllUsers();
     }
 
@@ -74,6 +75,11 @@ public class UserController {
     @GetMapping("/get-cart")
     public Set<CartItem> getAllItemsInCArt(@Validated @RequestBody EmailAddressDTO emailAddress) {
         return userService.viewItemsInCart(emailAddress);
+    }
+
+    @DeleteMapping("/delete-user-account")
+    ResponseEntity<?> deleteUserAccount(@Validated @RequestBody EmailAddressDTO emailAddressDTO) {
+        return userService.removeUser(emailAddressDTO);
     }
 
 }

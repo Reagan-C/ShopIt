@@ -26,12 +26,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsById(Long id);
 
     @Modifying
-    @Query(value = "update User u set u.firstName = ?1, u.lastName = ?2, u.address = ?3, u.city = ?4, u.country = ?5, "+
-            "u.phoneNumber = ?6 where u.id = ?7", nativeQuery = true)
-    User updateUser(String firstName, String lastName, String address, String city, String state, Country country,
+    @Query(value = "update User u set u.first_name = ?1, u.last_name = ?2, u.address = ?3, u.city = ?4, u.state = ?5, "+
+            "u.country_id=?6, u.phone_number = ?7 where u.id = ?8", nativeQuery = true)
+    void updateUser(String firstName, String lastName, String address, String city, String state, Long country_id,
                     String phoneNumber, Long id);
 
-    @Query(value = "select u from User u order by u.id desc", nativeQuery = true)
+    @Query(value = "select * from user  ORDER BY id ASC", nativeQuery = true)
     List<User> getAllUsers();
 }
 

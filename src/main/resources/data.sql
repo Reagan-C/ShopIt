@@ -1,11 +1,12 @@
- SELECT NOW();
+SELECT NOW();
 -- INSERT INTO roles(id, title, code, created_on, updated_on)
 --  VALUES
 --  (1, 'Administrator', 'Administrator', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 --  (2, 'Regular', 'Regular', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ;
---
+
 --  INSERT INTO category(id, category_name, abbreviation)
 --  VALUES
+--   (1,"Food and Edibles", "FE"),
 --   (2,"Clothing and apparels", "CA"),
 --   (3, "Footwear and Shoes", "FS"),
 --   (4, "Electronics and Gadgets", "EG"),

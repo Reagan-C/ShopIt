@@ -17,6 +17,9 @@ public class DateOfBirthValidator implements ConstraintValidator<DateOfBirth, Da
 
     @Override
     public boolean isValid(Date dateOfBirth, ConstraintValidatorContext constraintValidatorContext) {
+        if (dateOfBirth == null) {
+            return false;
+        }
         Instant instant = dateOfBirth.toInstant();
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
         LocalDate dob = zonedDateTime.toLocalDate();

@@ -11,6 +11,6 @@ import lombok.*;
 @Builder
 public class ItemCategoryDTO {
 
-    @NotBlank(message = "Please fill category name")
+    @NotBlank(message = "{category.name.notBlank}")
     private String categoryName;
 }

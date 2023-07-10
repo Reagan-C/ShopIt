@@ -16,6 +16,6 @@ public class SetItemPriceDTO {
     private String itemName;
 
     @JsonProperty("price")
-    @NotBlank(message = "Price field should be populated")
+    @NotBlank(message = "{product.price.notBlank}")
     private double price;
 }
