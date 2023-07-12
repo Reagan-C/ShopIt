@@ -2,6 +2,7 @@ package com.reagan.shopIt.model.dto.itemdto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @AllArgsConstructor
@@ -16,6 +17,6 @@ public class SetItemQuantityDTO {
     private String itemName;
 
     @JsonProperty("quantity")
-    @NotBlank(message = "{product.quantity.notBlank}")
+    @NotNull(message = "{product.quantity.notNull}")
     private Integer quantity;
 }

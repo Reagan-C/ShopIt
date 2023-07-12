@@ -1,6 +1,6 @@
 package com.reagan.shopIt.controllers.user;//package com.reagan.shopIt.controllers;
 
-import com.reagan.shopIt.model.domain.CartItem;
+import com.reagan.shopIt.model.domain.Cart;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
 import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
@@ -73,10 +73,11 @@ public class UserController {
     }
 
     @GetMapping("/get-cart")
-    public Set<CartItem> getAllItemsInCArt(@Validated @RequestBody EmailAddressDTO emailAddress) {
+    public Set<Cart> getAllItemsInCArt(@Validated @RequestBody EmailAddressDTO emailAddress) {
         return userService.viewItemsInCart(emailAddress);
     }
 
+    @PreAuthorize("hasRole('Administrator')")
     @DeleteMapping("/delete-user-account")
     ResponseEntity<?> deleteUserAccount(@Validated @RequestBody EmailAddressDTO emailAddressDTO) {
         return userService.removeUser(emailAddressDTO);

@@ -39,7 +39,7 @@ public class ItemController {
     }
 
     @PutMapping("/set-quantity")
-    public ResponseEntity<Item> increaseQuantity(@Validated @RequestBody SetItemQuantityDTO itemQuantityDTO) {
+    public ResponseEntity<String> increaseQuantity(@Validated @RequestBody SetItemQuantityDTO itemQuantityDTO) {
         return itemService.setItemQuantity(itemQuantityDTO);
     }
 

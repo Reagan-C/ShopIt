@@ -240,9 +240,11 @@ public class GlobalException {
         @ExceptionHandler(ItemNotFoundException.class)
         public Object notFound(ItemNotFoundException ex) {
                 final Map<String, Object> errors = new HashMap<>();
-                errors.put("entityName", "UserID");
-                errors.put("message", "UserID not found");
+                errors.put("entityName", "ItemID");
+                errors.put("message", "Item not found");
                 errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
                 return ex.getMessage();
         }
+
+
 }

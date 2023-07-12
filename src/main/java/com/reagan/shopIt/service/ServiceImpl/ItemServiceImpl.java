@@ -80,14 +80,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ResponseEntity<Item> setItemQuantity(SetItemQuantityDTO quantityDTO) {
+    public ResponseEntity<String> setItemQuantity(SetItemQuantityDTO quantityDTO) {
         Item item = itemRepository.findByName(quantityDTO.getItemName());
         if (item == null) {
             throw new ItemNotFoundException(quantityDTO.getItemName());
         }
         item.setQuantity(quantityDTO.getQuantity());
         itemRepository.save(item);
-        return ResponseEntity.ok(item);
+        return ResponseEntity.ok("Quantity updated");
     }
 
     @Override

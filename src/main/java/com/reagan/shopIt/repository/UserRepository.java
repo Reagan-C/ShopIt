@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -24,6 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmailAddress(String emailAddress);
 
     boolean existsById(Long id);
+
 
     @Modifying
     @Query(value = "update User u set u.first_name = ?1, u.last_name = ?2, u.address = ?3, u.city = ?4, u.state = ?5, "+

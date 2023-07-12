@@ -62,10 +62,6 @@ public class User {
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
-
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<PendingOrder> pendingOrders = new HashSet<>();
 
@@ -121,10 +117,6 @@ public class User {
 
     public void removeFromPendingOrder(PendingOrder pendingOrder) {
         this.pendingOrders.remove(pendingOrder);
-    }
-
-    public void resetUserCart() {
-        this.cart = new Cart();
     }
 
 }

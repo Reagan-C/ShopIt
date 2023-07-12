@@ -1,6 +1,5 @@
 package com.reagan.shopIt.repository;
 
-import com.reagan.shopIt.model.domain.AuthToken;
 import com.reagan.shopIt.model.domain.FulfilledOrders;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

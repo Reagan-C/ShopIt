@@ -19,7 +19,7 @@ public interface ItemService {
     ResponseEntity<?> updateItem(UpdateItemDTO updateItemDTO);
 
     @Transactional
-    ResponseEntity<Item> setItemQuantity(SetItemQuantityDTO quantityDTO);
+    ResponseEntity<String> setItemQuantity(SetItemQuantityDTO quantityDTO);
 
     ResponseEntity<Item> setItemNewPrice(SetItemPriceDTO priceDTO);
 

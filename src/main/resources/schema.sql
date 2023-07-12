@@ -13,18 +13,12 @@
     CREATE TABLE IF NOT EXISTS `cart` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `user_id` BIGINT,
-        `total_price` DOUBLE,
+        `item_id` BIGINT,
+        `unit_cost` FLOAT(53) NOT NULL,
+        `quantity` INTEGER NOT NULL,
+        `total_cost` FLOAT(53) NOT NULL,
         PRIMARY KEY (`id`)
     );
-
-    CREATE TABLE IF NOT EXISTS `cart_item` (
-            `id` BIGINT NOT NULL AUTO_INCREMENT,
-            `cart_id`   BIGINT,
-            `item_id` BIGINT,
-            `count_of_items`  INT,
-            `cart_item_price`  DOUBLE,
-            PRIMARY KEY (`id`)
-        );
 
 
     CREATE TABLE IF NOT EXISTS `category` (
@@ -69,7 +63,7 @@
     );
 
 
-    CREATE TABLE IF NOT EXISTS `auth_token` (
+    CREATE TABLE IF NOT EXISTS `otp` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `token` VARCHAR(255) NOT NULL,
         `user_id` BIGINT,
@@ -118,7 +112,6 @@
         `authentication_token` VARCHAR(255),
         `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
         `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `cart_id` BIGINT,
         `country_id` BIGINT,
 
         PRIMARY KEY (`id`)

@@ -99,14 +99,14 @@ public class UserServiceImpl implements UserService {
         newUser.setPassword(passwordEncoder.encode(body.getPassword()));
         newUser.setCountry(country);
 
-        //Generate and save confirmation token to AuthToken class. also set user auth token to token
+        //Generate and save confirmation token to OTP class. also set user auth token to token
         String token = generator.createVerificationToken();
-        AuthToken authToken = new AuthToken();
-        authToken.setToken(token);
-        authToken.setCreatedAt(LocalDateTime.now());
-        authToken.setConfirmedAt(null);
-        authToken.setExpiresAt(LocalDateTime.now().plusMinutes(20));
-        authToken.setUser(newUser);
+        OTP otp = new OTP();
+        otp.setToken(token);
+        otp.setCreatedAt(LocalDateTime.now());
+        otp.setConfirmedAt(null);
+        otp.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+        otp.setUser(newUser);
 
         newUser.setAuthenticationToken(token);
 
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
 //        emailService.sendAccountConfirmationMail(body.getEmailAddress(),
 //                emailService.buildEmail(body.getFirstName(), link));
         userRepository.save(newUser);
-        otpRepository.save(authToken);
+        otpRepository.save(otp);
         return ResponseEntity.ok("Account created, Please log into your Email to confirm your account ");
     }
 
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<String> confirmSignUpToken(UUID token) {
         User user1;
         //check if token exists and get user if true
-        AuthToken confirmationToken = otpRepository.findByToken(token.toString())
+        OTP confirmationToken = otpRepository.findByToken(token.toString())
                 .orElseThrow(InvalidOtpException::new);
 
         user1 = confirmationToken.getUser();
@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
         if (expiredAt.isBefore(LocalDateTime.now())) {
             user1.setCountry(null);
-            otpRepository.delete(confirmationToken);
+            userRepository.delete(user1);
             return  ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Your OTP has expired");
         }
 
@@ -166,7 +166,8 @@ public class UserServiceImpl implements UserService {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getEmailAddress(),
                     body.getPassword()));
         } catch (Exception e) {
-            throw e;
+            System.out.println(e.getLocalizedMessage());
+            throw new IllegalArgumentException(" Authentication Failure");
         }
         String jwt =  tokenProvider.generateJwtToken(body.getEmailAddress());
         System.out.println("successful");
@@ -193,14 +194,14 @@ public class UserServiceImpl implements UserService {
         }
         //Generate otp and send to user
         String token = generator.createPasswordResetToken();
-        AuthToken authToken = new AuthToken();
-        authToken.setToken(token);
-        authToken.setCreatedAt(LocalDateTime.now());
-        authToken.setExpiresAt(LocalDateTime.now().plusMinutes(20));
-        authToken.setUser(user);
-        authToken.setConfirmedAt(null);
+        OTP OTP = new OTP();
+        OTP.setToken(token);
+        OTP.setCreatedAt(LocalDateTime.now());
+        OTP.setExpiresAt(LocalDateTime.now().plusMinutes(20));
+        OTP.setUser(user);
+        OTP.setConfirmedAt(null);
 
-        otpRepository.save(authToken);
+        otpRepository.save(OTP);
 //        emailService.sendChangePasswordMail(email, token);
         return "Please check your Email for otp";
     }
@@ -215,7 +216,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNameNotFoundException(resetPasswordDTO.getEmailAddress());
         }
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(resetPasswordDTO.getOtp())
+        OTP confirmationToken = otpRepository.findByToken(resetPasswordDTO.getOtp())
                 .orElseThrow(InvalidOtpException::new);
         //check if token is already confirmed
         if (confirmationToken.getConfirmedAt() != null) {
@@ -318,29 +319,52 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public ResponseEntity<?> removeUser(EmailAddressDTO emailAddressDTO) {
+        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
+        if (user == null) {
+            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
+        }
+        user.removeUserRoles();
+        user.setCountry(null);
+
+        cartRepository.deleteByUserId(user.getId());
+        userRepository.delete(user);
+        return ResponseEntity.ok("User account successfully deleted");
+    }
+
+    @Override
+    @Transactional
     public void addItemToCart(AddCartItemsDTO addCartItemsDTO) {
         //first check if user exists
         User user = userRepository.findByEmailAddress(addCartItemsDTO.getEmailAddress());
         if (user == null) {
             throw new UserNameNotFoundException(addCartItemsDTO.getEmailAddress());
         }
-        // then check if item exists by that name
+        // then check if item exists by that name and if we have item in stock
         Item item = itemRepository.findByName(addCartItemsDTO.getItemName());
-        if (item == null) {
+        if (item == null || item.getQuantity() < 1) {
             throw  new ItemNotFoundException(addCartItemsDTO.getItemName());
         }
+        // create new cartItem object
+        Optional<Cart> myCart = cartRepository.findByUserAndItem(user, item);
 
-        Cart cart = user.getCart();
-        if (cart == null) {
-            Cart newCart = new Cart();
-            newCart.addItem(item);
+        if (myCart.isPresent()) {
+            Cart cart = myCart.get();
+            cart.setQuantity(cart.getQuantity() + 1);
+            cart.setTotalCost(cart.getUnitCost() * cart.getQuantity());
+            cartRepository.save(cart);
         } else {
-            cart.addItem(item);
+            Cart newCart = new Cart();
+            newCart.setItem(item);
+            newCart.setUser(user);
+            newCart.setQuantity(1);
+            newCart.setUnitCost(item.getPrice());
+            newCart.setTotalCost(newCart.getUnitCost() * newCart.getQuantity());
+            cartRepository.save(newCart);
+            userRepository.save(user);
         }
-        user.setCart(cart);
+        item.setQuantity(item.getQuantity() - 1);
         itemRepository.save(item);
-        userRepository.save(user);
-
     }
 
     @Override
@@ -357,27 +381,22 @@ public class UserServiceImpl implements UserService {
             throw new ItemNotFoundException(removeItemDTO.getName());
         }
         // check if user cart exists
-        Cart cart = newUser.getCart();
-        if (cart == null) {
-            throw new IllegalArgumentException("Cart is empty, Please add items to cart first");
-        }
-        cart.removeItem(newItem);
-        newUser.setCart(cart);
+
         itemRepository.save(newItem);
         userRepository.save(newUser);
     }
 
     @Override
-    public Set<CartItem> viewItemsInCart(EmailAddressDTO emailAddressDTO) {
+    public Set<Cart> viewItemsInCart(EmailAddressDTO emailAddressDTO) {
         User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
         if (user == null) {
             throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
         }
-        Cart userCart = user.getCart();
-        if (userCart == null) {
-            throw new IllegalArgumentException("Cart is empty at the moment");
-        }
-        return userCart.getCartItems();
+//        Cart userCart = user.getCart();
+//        if (userCart == null) {
+//            throw new IllegalArgumentException("Cart is empty at the moment");
+//        }
+        return null;
     }
 
     @Override
@@ -387,10 +406,10 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
         }
-        Cart cartToOrder = user.getCart();
-        if (cartToOrder == null) {
-            throw new IllegalArgumentException("Cart is empty, Please select items first");
-        }
+//        Cart cartToOrder = user.getCart();
+//        if (cartToOrder == null) {
+//            throw new IllegalArgumentException("Cart is empty, Please select items first");
+//        }
         //Proceed to checkout
 
         //generate order tracking code
@@ -398,16 +417,16 @@ public class UserServiceImpl implements UserService {
         if (token == null) {
             throw new IllegalArgumentException("Problem encountered while generating token");
         }
-        AuthToken authToken = new AuthToken();
-        authToken.setUser(user);
-        authToken.setCreatedAt(LocalDateTime.now());
-        authToken.setConfirmedAt(null);
-        authToken.setToken(token);
-        authToken.setExpiresAt(LocalDateTime.now().plusDays(365));
+        OTP OTP = new OTP();
+        OTP.setUser(user);
+        OTP.setCreatedAt(LocalDateTime.now());
+        OTP.setConfirmedAt(null);
+        OTP.setToken(token);
+        OTP.setExpiresAt(LocalDateTime.now().plusDays(365));
         // save items in cart to pending orders table
         PendingOrder pendingOrder = new PendingOrder();
         pendingOrder.setUser(user);
-        pendingOrder.setCart(cartToOrder);
+//        pendingOrder.setCart(cartToOrder);
         pendingOrder.setToken(token);
         pendingOrder.setCreatedOn(new Date());
         //update user field
@@ -415,17 +434,16 @@ public class UserServiceImpl implements UserService {
         user.setAuthenticationToken(token);
 
         // Get total price of items in cart
-        double totalPrice = cartToOrder.getTotalPrice();
+        double totalPrice =9;
 
         //send order details email
         emailService.sendOrderTrackingMail(emailAddressDTO.getEmailAddress(),token);
 
-        //reset fields and persist
-        user.resetUserCart();
-        cartToOrder.resetCart();
-        pendingOrderRepository.save(pendingOrder);
-        otpRepository.save(authToken);
-        cartRepository.save(cartToOrder);
+//        //reset fields and persist
+//        user.resetUserCart();
+//        pendingOrderRepository.save(pendingOrder);
+//        otpRepository.save(OTP);
+//        cartRepository.save(cartToOrder);
         userRepository.save(user);
         return ResponseEntity.ok("Order Placed. An order tracking code has been sent to your" +
                 "registered email address. Total cost is " + totalPrice);
@@ -476,7 +494,7 @@ public class UserServiceImpl implements UserService {
     public String confirmOrder(String token) {
 
         //check if token exists
-        AuthToken confirmationToken = otpRepository.findByToken(token)
+        OTP confirmationToken = otpRepository.findByToken(token)
                 .orElseThrow(InvalidOtpException::new);
 
         if (confirmationToken.getConfirmedAt() != null) {
@@ -522,23 +540,6 @@ public class UserServiceImpl implements UserService {
            myRoles.add(role.getTitle());
         }
         return myRoles;
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<?> removeUser(EmailAddressDTO emailAddressDTO) {
-        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
-        if (user == null) {
-            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
-        }
-        AuthToken authToken = otpRepository.findByUser(user);
-        if (authToken != null) {
-            user.setCountry(null);
-            user.removeUserRoles();
-            otpRepository.delete(authToken);
-            return ResponseEntity.ok("Account deletion successful");
-        }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Failure encountered during deletion");
     }
 
 }
