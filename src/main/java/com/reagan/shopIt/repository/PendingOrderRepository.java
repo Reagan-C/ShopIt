@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PendingOrderRepository extends JpaRepository<PendingOrder, Long> {
@@ -20,4 +21,6 @@ public interface PendingOrderRepository extends JpaRepository<PendingOrder, Long
     List<PendingOrder> getAllOrders();
 
     PendingOrder findByToken(String token);
+
+    Optional<PendingOrder> findByIdAndUserId(Long id, Long userId);
 }

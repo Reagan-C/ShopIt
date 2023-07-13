@@ -256,4 +256,23 @@ public class GlobalException {
                 return ex.getMessage();
         }
 
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(PendingOrderNotFoundException.class)
+        public Object notFound(PendingOrderNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Item");
+                errors.put("message", "Item empty");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(TokenNotFoundException.class)
+        public Object tokenNotFound(TokenNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Token");
+                errors.put("message", "Token empty");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
 }

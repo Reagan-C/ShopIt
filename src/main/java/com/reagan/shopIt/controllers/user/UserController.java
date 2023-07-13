@@ -56,9 +56,11 @@ public class UserController {
         return userService.placeOrder(id);
     }
 
+    @PreAuthorize("hasRole(('Administrator')")
     @PostMapping("/send-order-confirmation-mail")
-    public ResponseEntity<?> sendOrderConfirmationMail(@Validated @RequestBody EmailAddressDTO body) {
-        return userService.confirmOrderReceptionMail(body);
+    public ResponseEntity<?> sendOrderConfirmationMail(@RequestParam("id") Long id,
+                                                       @RequestParam("user_id")Long userId) {
+        return userService.confirmOrderReceptionMail(id, userId);
     }
 
     @PostMapping("/confirm-order")

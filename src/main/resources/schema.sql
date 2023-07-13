@@ -42,9 +42,9 @@
     CREATE TABLE IF NOT EXISTS `fulfilled_orders` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `user_id` BIGINT,
-        `token` VARCHAR (255),
         `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `confirmed_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `confirmed_on` TIMESTAMP  DEFAULT NULL,
+        `tracking_id` VARCHAR(255) NOT NULL,
         PRIMARY KEY (`id`)
     );
 
@@ -80,6 +80,7 @@
         `confirmed` BOOLEAN NOT NULL DEFAULT FALSE,
         `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
         `token` VARCHAR (255),
+        `cost` DOUBLE NOT NULL,
         `user_id` BIGINT,
         PRIMARY KEY (`id`)
     );

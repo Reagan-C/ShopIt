@@ -43,7 +43,7 @@ public interface UserService {
     ResponseEntity<String> placeOrder(Long userId);
 
     @Transactional
-    ResponseEntity<?> confirmOrderReceptionMail(EmailAddressDTO emailAddressDTO);
+    ResponseEntity<?> confirmOrderReceptionMail(Long id, Long userId);
 
     String confirmOrder (String token);
 

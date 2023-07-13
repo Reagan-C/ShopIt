@@ -4,6 +4,7 @@ import com.reagan.shopIt.model.domain.Cart;
 import com.reagan.shopIt.model.domain.Item;
 import com.reagan.shopIt.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,6 +25,7 @@ public interface CartRepository extends JpaRepository<Cart, Long> {
 
     Optional<Cart> findByUserAndItem(User user, Item item);
 
-
-    void deleteByUserId(Long user_id);
+    @Modifying
+    @Query(value = "delete from cart c where c.user_id=:id", nativeQuery = true)
+    void deleteByUserId(@Param("id") Long id);
 }

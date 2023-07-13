@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface FulfilledOrderRepository extends JpaRepository<FulfilledOrders, Long> {
@@ -18,5 +19,5 @@ public interface FulfilledOrderRepository extends JpaRepository<FulfilledOrders,
     @Query(value = "select i from FulfilledOrders i", nativeQuery = true)
     List<FulfilledOrders> getAllFulfilledOrders();
 
-    FulfilledOrders findByToken(String token);
+    Optional<FulfilledOrders> findByTrackingId(String token);
 }

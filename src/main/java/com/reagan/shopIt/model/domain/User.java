@@ -62,11 +62,6 @@ public class User {
     @JoinColumn(name = "country_id")
     private Country country;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<PendingOrder> pendingOrders = new HashSet<>();
-
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<FulfilledOrders> fulfilledOrders = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -105,18 +100,6 @@ public class User {
 
     public void removeFromAdmin(UserRole userRole) {
         this.roles.remove(userRole);
-    }
-
-    public void addPendingOrder(PendingOrder pendingOrder) {
-        this.pendingOrders.add(pendingOrder);
-    }
-
-    public void addFulfilledOrder(FulfilledOrders fulfilledOrder) {
-        this.fulfilledOrders.add(fulfilledOrder);
-    }
-
-    public void removeFromPendingOrder(PendingOrder pendingOrder) {
-        this.pendingOrders.remove(pendingOrder);
     }
 
 }

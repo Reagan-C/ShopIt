@@ -169,7 +169,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalArgumentException(" Authentication Failure");
         }
         String jwt =  tokenProvider.generateJwtToken(body.getEmailAddress());
-        System.out.println("successful");
         return ResponseEntity.ok().body("Login successful " + jwt);
     }
 
@@ -278,7 +277,6 @@ public class UserServiceImpl implements UserService {
          userDetails.put("City", user.getCity());
          userDetails.put("State", user.getState());
          userDetails.put("Country", user.getCountry().getTitle());
-         userDetails.put("Fulfilled Orders", user.getFulfilledOrders());
          userDetails.put("Created account on", user.getCreatedOn().toString());
          userDetails.put("Last updated account on", user.getUpdatedOn().toString());
          return userDetails;
@@ -306,7 +304,6 @@ public class UserServiceImpl implements UserService {
             userDetail.put("City", user.getCity());
             userDetail.put("State", user.getState());
             userDetail.put("Country", user.getCountry().getTitle());
-            userDetail.put("Fulfilled Orders", user.getFulfilledOrders());
             userDetail.put("Created account on", user.getCreatedOn().toString());
             userDetail.put("Last updated account on", user.getUpdatedOn().toString());
 
@@ -427,136 +424,87 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public ResponseEntity<String> placeOrder(Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            double totalCost = 0;
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new UserIDNotFoundException(userId));
 
-            String token = generator.createOrderTrackingCode();
-            if (token == null) {
-                throw new IllegalArgumentException("Problem encountered while generating tracking token");
-            }
+        double totalCost = 0;
 
-            List<Cart> myCartItems = cartRepository.findAllByUserId(userId);
-            if (myCartItems.isEmpty()) {
-                throw new CartEmptyException(user.getFirstName());
-            }
-            PendingOrder pendingOrder = new PendingOrder();
-            for (Cart cart : myCartItems) {
-                totalCost += cart.getTotalCost();
+        List<Cart> myCartItems = cartRepository.findAllByUserId(userId);
+        if (myCartItems.isEmpty()) {
+            throw new CartEmptyException(user.getFirstName());
+        }
 
-                Map<String, Object> responseMap = new LinkedHashMap<>();
+        String token = generator.createOrderTrackingCode();
+        PendingOrder pendingOrder = new PendingOrder();
 
-                responseMap.put("name", cart.getItem().getName());
-                responseMap.put("picture", cart.getItem().getPicture());
-                responseMap.put("quantity", cart.getQuantity());
-                responseMap.put("item_total_cost", cart.getTotalCost());
+        for (Cart cart : myCartItems) {
+            totalCost += cart.getTotalCost();
 
+            pendingOrder.addCartItem(cart);
+        }
+        pendingOrder.setCost(totalCost);
+        pendingOrder.setConfirmed(false);
+        pendingOrder.setUser(user);
+        pendingOrder.setToken(token);
 
-                pendingOrder.addCartItem(responseMap);
-            }
-            Map<String, Object> costMap = new HashMap<>();
-            costMap.put("Total cost of items in cart", totalCost);
-            pendingOrder.addCartItem(costMap);
-
-            pendingOrder.setConfirmed(false);
-            pendingOrder.setUser(user);
-            pendingOrder.setToken(token);
-            pendingOrder.setCreatedOn(new Date());
-
-            user.addPendingOrder(pendingOrder);
-            user.setAuthenticationToken(token);
-
-            //send order details email
+        //send order details email
 //            emailService.sendOrderTrackingMail(user.getEmailAddress(),token);
 
-
-            pendingOrderRepository.save(pendingOrder);
-            cartRepository.deleteByUserId(userId);
-            return ResponseEntity.ok("Order Placed. An order tracking code has been sent to your" +
-                    "registered email address. Total cost is " + totalCost);
-
-        }
-            throw new UserIDNotFoundException(userId);
+        pendingOrderRepository.save(pendingOrder);
+        cartRepository.deleteByUserId(userId);
+        return ResponseEntity.ok("Order Placed. An order tracking code has been sent to your" +
+                " registered email address. Total cost is " + totalCost);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> confirmOrderReceptionMail(EmailAddressDTO emailAddressDTO) {
-        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
-        if (user == null) {
-            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
-        }
+    public ResponseEntity<?> confirmOrderReceptionMail(Long id, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserIDNotFoundException(userId));
 
-        String token = user.getAuthenticationToken();
-        if (token == null) {
-            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(user.getFirstName() + " " +
-                    "has no valid token");
-        }
+        PendingOrder pendingOrder = pendingOrderRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new PendingOrderNotFoundException(id, userId));
 
-        String link = "http://localhost:8080/api/v1/orders/confirm-order?token=" + token;
+        if (pendingOrder.getConfirmed()) {
+            throw new IllegalArgumentException("Pending order already confirmed");
+        }
+        pendingOrder.setConfirmed(true);
+
+        String token =  pendingOrder.getToken();
 
         FulfilledOrders fulfilledOrders = new FulfilledOrders();
         fulfilledOrders.setUser(user);
         fulfilledOrders.setCreatedOn(new Date());
         fulfilledOrders.setConfirmedOn(null);
-        fulfilledOrders.setToken(token);
-
-        PendingOrder pendingOrder = pendingOrderRepository.findByToken(token);
-        pendingOrder.setConfirmed(true);
+        fulfilledOrders.setTrackingId(token);
         fulfilledOrders.addFulfilledOrder(pendingOrder);
 
-        // To remove order from user's pending order
-        user.removeFromPendingOrder(pendingOrder);
+        String link = "http://localhost:8080/api/v1/orders/confirm-order?token=" + token;
 
-        // save updates
-        fulfilledOrderRepository.save(fulfilledOrders);
         pendingOrderRepository.save(pendingOrder);
-        userRepository.save(user);
+        fulfilledOrderRepository.save(fulfilledOrders);
 
-        emailService.sendOrderDeliveryMail(emailAddressDTO.getEmailAddress(),
-                emailService.buildOrderConfirmationEmail(user.getFirstName(), link));
+//        emailService.sendOrderDeliveryMail(user.getEmailAddress(),
+//                emailService.buildOrderConfirmationEmail(user.getFirstName(), link));
 
-        return ResponseEntity.status(HttpStatus.OK).body("Please proceed to your email account to confirm");
+        return ResponseEntity.status(HttpStatus.OK).body("Please proceed to your email account to confirm" +
+                " reception of your order with tracking ID " + token);
     }
 
     @Override
     @Transactional
     public String confirmOrder(String token) {
 
-        //check if token exists
-        OTP confirmationToken = otpRepository.findByToken(token)
-                .orElseThrow(InvalidOtpException::new);
 
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new ConfirmedOtpException();
-        }
+        FulfilledOrders fulfilledOrder = fulfilledOrderRepository.findByTrackingId(token).orElseThrow(
+                TokenNotFoundException::new
+        );
 
-        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
-        if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new ExpiredOtpException();
-        }
-
-        FulfilledOrders fulfilledOrder = fulfilledOrderRepository.findByToken(token);
-        if (fulfilledOrder == null) {
-            throw new IllegalArgumentException("Fulfilled order associated with token not found");
-        }
-
-        User user = userRepository.findByAuthenticationToken(token);
-        if (user == null) {
-            throw new IllegalArgumentException("No user found for token");
+        if (fulfilledOrder.getConfirmedOn() != null) {
+            throw new IllegalArgumentException("Order reception already confirmed");
         }
 
         fulfilledOrder.setConfirmedOn(new Date());
-        confirmationToken.setConfirmedAt(LocalDateTime.now());
-
-        user.addFulfilledOrder(fulfilledOrder);
-        user.setAuthenticationToken(null);
-
-        otpRepository.save(confirmationToken);
         fulfilledOrderRepository.save(fulfilledOrder);
-        userRepository.save(user);
-
         return "Thank you for shopping with us!";
     }
 

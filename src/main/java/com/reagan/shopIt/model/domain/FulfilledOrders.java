@@ -36,13 +36,11 @@ public class FulfilledOrders {
     @Column(name = "created_on", updatable = false, nullable = false)
     private Date createdOn;
 
-    @UpdateTimestamp
+    @Column(name = "tracking_id", nullable = false)
+    private String trackingId;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "confirmed_on")
     private Date confirmedOn;
-
-    @Column(name = "token")
-    private String token;
 
     public void addFulfilledOrder(PendingOrder order) {
         orders.add(order);

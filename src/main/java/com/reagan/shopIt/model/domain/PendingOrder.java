@@ -25,17 +25,23 @@ public class PendingOrder {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private List<Map<String, Object>> items = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Cart> cartList = new ArrayList<>();
 
     @Column(name = "token")
     private String token;
+
+    @Column(name = "cost")
+    private double cost;
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on", updatable = false, nullable = false)
     private Date createdOn;
 
-    public void addCartItem(Map<String, Object> mapItems) {
-        this.items.add(mapItems);
+
+    public void addCartItem(Cart cart) {
+        cartList.add(cart);
     }
 }
 
