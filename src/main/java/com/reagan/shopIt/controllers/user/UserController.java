@@ -1,11 +1,7 @@
-package com.reagan.shopIt.controllers.user;//package com.reagan.shopIt.controllers;
+package com.reagan.shopIt.controllers.user;
 
-import com.reagan.shopIt.model.domain.Cart;
-import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
-import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
-import com.reagan.shopIt.model.dto.itemdto.AddItemDTO;
 import com.reagan.shopIt.model.dto.userdto.UpdateUserDTO;
 import com.reagan.shopIt.service.UserService;
 import org.springframework.http.MediaType;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RestController
 @RequestMapping(value = "user", produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -52,14 +47,13 @@ public class UserController {
     }
 
     @DeleteMapping("/remove-from-cart")
-    public String removeItemFromCart(@Validated @RequestBody OrderCartItemsDTO body) {
-        userService.removeItemFromCart(body);
-        return body.getName() + " removed from cart";
+    public String removeItemFromCart(@RequestParam("user_id") Long userId, @RequestParam("item_id") Long itemId) {
+        return userService.removeItemFromCart(userId, itemId);
     }
 
     @PostMapping("/place-order")
-    public ResponseEntity<String> placeOrder(@Validated @RequestBody EmailAddressDTO email) {
-        return userService.placeOrder(email);
+    public ResponseEntity<String> placeOrder(@RequestParam("id") Long id) {
+        return userService.placeOrder(id);
     }
 
     @PostMapping("/send-order-confirmation-mail")
@@ -73,8 +67,8 @@ public class UserController {
     }
 
     @GetMapping("/get-cart")
-    public Set<Cart> getAllItemsInCArt(@Validated @RequestBody EmailAddressDTO emailAddress) {
-        return userService.viewItemsInCart(emailAddress);
+    public List<Map<String, Object>> getAllItemsInCArt(@RequestParam("id") Long userId) {
+        return userService.viewItemsInCart(userId);
     }
 
     @PreAuthorize("hasRole('Administrator')")

@@ -246,5 +246,14 @@ public class GlobalException {
                 return ex.getMessage();
         }
 
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(CartEmptyException.class)
+        public Object cartEmpty(CartEmptyException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Item");
+                errors.put("message", "Item empty");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
 
 }

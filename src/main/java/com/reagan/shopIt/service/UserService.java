@@ -1,8 +1,6 @@
 package com.reagan.shopIt.service;
 
-import com.reagan.shopIt.model.domain.Cart;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
-import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import jakarta.transaction.Transactional;
@@ -10,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public interface UserService {
@@ -41,16 +38,16 @@ public interface UserService {
     void addItemToCart(AddCartItemsDTO itemName);
 
     @Transactional
-    void removeItemFromCart(OrderCartItemsDTO itemName);
+    String removeItemFromCart(Long userId, Long itemId);
 
-    ResponseEntity<String> placeOrder(EmailAddressDTO emailAddressDTO);
+    ResponseEntity<String> placeOrder(Long userId);
 
     @Transactional
     ResponseEntity<?> confirmOrderReceptionMail(EmailAddressDTO emailAddressDTO);
 
     String confirmOrder (String token);
 
-    Set<Cart> viewItemsInCart(EmailAddressDTO emailAddressDTO);
+    List<Map<String, Object>> viewItemsInCart(Long id);
 
     List<String> getUserRoles(EmailAddressDTO dto);
 

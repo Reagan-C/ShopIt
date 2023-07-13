@@ -80,7 +80,6 @@
         `confirmed` BOOLEAN NOT NULL DEFAULT FALSE,
         `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
         `token` VARCHAR (255),
-        `cart_id` BIGINT,
         `user_id` BIGINT,
         PRIMARY KEY (`id`)
     );

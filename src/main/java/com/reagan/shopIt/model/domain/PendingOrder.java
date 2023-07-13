@@ -19,15 +19,13 @@ public class PendingOrder {
     private Long Id;
 
     @Column(name = "confirmed")
-    private Boolean confirmed = false;
+    private Boolean confirmed;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    private List<Map<String, Object>> items = new ArrayList<>();
 
     @Column(name = "token")
     private String token;
@@ -36,5 +34,8 @@ public class PendingOrder {
     @Column(name = "created_on", updatable = false, nullable = false)
     private Date createdOn;
 
+    public void addCartItem(Map<String, Object> mapItems) {
+        this.items.add(mapItems);
+    }
 }
 

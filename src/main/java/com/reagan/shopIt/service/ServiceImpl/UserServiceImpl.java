@@ -3,7 +3,6 @@ package com.reagan.shopIt.service.ServiceImpl;
 import com.reagan.shopIt.config.security.jwt.JwtTokenProvider;
 import com.reagan.shopIt.model.domain.*;
 import com.reagan.shopIt.model.dto.cartdto.AddCartItemsDTO;
-import com.reagan.shopIt.model.dto.cartdto.OrderCartItemsDTO;
 import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.model.dto.userdto.*;
 import com.reagan.shopIt.model.enums.UserRoleType;
@@ -342,7 +341,7 @@ public class UserServiceImpl implements UserService {
         }
         // then check if item exists by that name and if we have item in stock
         Item item = itemRepository.findByName(addCartItemsDTO.getItemName());
-        if (item == null || item.getQuantity() < 1) {
+        if (item == null || item.getQuantity() < addCartItemsDTO.getUnit()) {
             throw  new ItemNotFoundException(addCartItemsDTO.getItemName());
         }
         // create new cartItem object
@@ -350,103 +349,135 @@ public class UserServiceImpl implements UserService {
 
         if (myCart.isPresent()) {
             Cart cart = myCart.get();
-            cart.setQuantity(cart.getQuantity() + 1);
+            cart.setQuantity(cart.getQuantity() + addCartItemsDTO.getUnit());
             cart.setTotalCost(cart.getUnitCost() * cart.getQuantity());
             cartRepository.save(cart);
         } else {
             Cart newCart = new Cart();
             newCart.setItem(item);
             newCart.setUser(user);
-            newCart.setQuantity(1);
+            newCart.setQuantity(addCartItemsDTO.getUnit());
             newCart.setUnitCost(item.getPrice());
             newCart.setTotalCost(newCart.getUnitCost() * newCart.getQuantity());
             cartRepository.save(newCart);
-            userRepository.save(user);
         }
-        item.setQuantity(item.getQuantity() - 1);
+        item.setQuantity(item.getQuantity() - addCartItemsDTO.getUnit());
         itemRepository.save(item);
     }
 
     @Override
     @Transactional
-    public void removeItemFromCart(OrderCartItemsDTO removeItemDTO) {
-        //check if user is valid
-        User newUser = userRepository.findByEmailAddress(removeItemDTO.getEmailAddress());
-        if (newUser == null) {
-            throw new UserNameNotFoundException(removeItemDTO.getEmailAddress());
-        }
-        //check if item exists with that name
-        Item newItem = itemRepository.findByName(removeItemDTO.getName());
-        if (newItem == null) {
-            throw new ItemNotFoundException(removeItemDTO.getName());
-        }
-        // check if user cart exists
+    public String removeItemFromCart(Long userId, Long itemId) {
+        //check if user is and item ids are valid
+        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<Item> optionalItem = itemRepository.findById(itemId);
+        if (optionalUser.isPresent() && optionalItem.isPresent()) {
+            User user = optionalUser.get();
+            Item item = optionalItem.get();
 
-        itemRepository.save(newItem);
-        userRepository.save(newUser);
+            Optional<Cart> optionalCart = cartRepository.findByUserAndItem(user, item);
+            if (optionalCart.isPresent()) {
+                Cart myCartItem = optionalCart.get();
+                myCartItem.setUser(null);
+                item.setQuantity(item.getQuantity() + myCartItem.getQuantity());
+
+                itemRepository.save(item);
+                cartRepository.delete(myCartItem);
+                return myCartItem.getItem().getName() + " removed from cart";
+            }
+            return item.getName() + " not present in cart";
+        }
+        return "User ID or Item ID invalid";
     }
 
     @Override
-    public Set<Cart> viewItemsInCart(EmailAddressDTO emailAddressDTO) {
-        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
-        if (user == null) {
-            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
-        }
-//        Cart userCart = user.getCart();
-//        if (userCart == null) {
-//            throw new IllegalArgumentException("Cart is empty at the moment");
-//        }
-        return null;
+    public List<Map<String, Object>> viewItemsInCart(Long userId) {
+        List<Map<String, Object>> responseList = new ArrayList<>();
+
+       Optional<User> optionalUser = userRepository.findById(userId);
+       if (optionalUser.isPresent()) {
+           User user = optionalUser.get();
+
+           double totalCost = 0;
+           List<Cart> myCartItems = cartRepository.findAllByUserId(userId);
+           if (myCartItems.isEmpty()) {
+               throw new CartEmptyException(user.getFirstName());
+           }
+           for (Cart cart : myCartItems) {
+               totalCost += cart.getTotalCost();
+               Map<String, Object> responseMap = new LinkedHashMap<>();
+
+               responseMap.put("name", cart.getItem().getName());
+               responseMap.put("unit_cost", cart.getUnitCost());
+               responseMap.put("quantity", cart.getQuantity());
+               responseMap.put("item_total_cost", cart.getTotalCost());
+               responseMap.put("picture", cart.getItem().getPicture());
+
+               responseList.add(responseMap);
+           }
+
+           Map<String, Object> totalCostMap = new HashMap<>();
+           totalCostMap.put("Total cost of items in cart", totalCost);
+           responseList.add(totalCostMap);
+           return responseList;
+       }
+       throw new UserIDNotFoundException(userId);
     }
 
     @Override
     @Transactional
-    public ResponseEntity<String> placeOrder(EmailAddressDTO emailAddressDTO) {
-        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
-        if (user == null) {
-            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
+    public ResponseEntity<String> placeOrder(Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            double totalCost = 0;
+
+            String token = generator.createOrderTrackingCode();
+            if (token == null) {
+                throw new IllegalArgumentException("Problem encountered while generating tracking token");
+            }
+
+            List<Cart> myCartItems = cartRepository.findAllByUserId(userId);
+            if (myCartItems.isEmpty()) {
+                throw new CartEmptyException(user.getFirstName());
+            }
+            PendingOrder pendingOrder = new PendingOrder();
+            for (Cart cart : myCartItems) {
+                totalCost += cart.getTotalCost();
+
+                Map<String, Object> responseMap = new LinkedHashMap<>();
+
+                responseMap.put("name", cart.getItem().getName());
+                responseMap.put("picture", cart.getItem().getPicture());
+                responseMap.put("quantity", cart.getQuantity());
+                responseMap.put("item_total_cost", cart.getTotalCost());
+
+
+                pendingOrder.addCartItem(responseMap);
+            }
+            Map<String, Object> costMap = new HashMap<>();
+            costMap.put("Total cost of items in cart", totalCost);
+            pendingOrder.addCartItem(costMap);
+
+            pendingOrder.setConfirmed(false);
+            pendingOrder.setUser(user);
+            pendingOrder.setToken(token);
+            pendingOrder.setCreatedOn(new Date());
+
+            user.addPendingOrder(pendingOrder);
+            user.setAuthenticationToken(token);
+
+            //send order details email
+//            emailService.sendOrderTrackingMail(user.getEmailAddress(),token);
+
+
+            pendingOrderRepository.save(pendingOrder);
+            cartRepository.deleteByUserId(userId);
+            return ResponseEntity.ok("Order Placed. An order tracking code has been sent to your" +
+                    "registered email address. Total cost is " + totalCost);
+
         }
-//        Cart cartToOrder = user.getCart();
-//        if (cartToOrder == null) {
-//            throw new IllegalArgumentException("Cart is empty, Please select items first");
-//        }
-        //Proceed to checkout
-
-        //generate order tracking code
-        String token = generator.createOrderTrackingCode();
-        if (token == null) {
-            throw new IllegalArgumentException("Problem encountered while generating token");
-        }
-        OTP OTP = new OTP();
-        OTP.setUser(user);
-        OTP.setCreatedAt(LocalDateTime.now());
-        OTP.setConfirmedAt(null);
-        OTP.setToken(token);
-        OTP.setExpiresAt(LocalDateTime.now().plusDays(365));
-        // save items in cart to pending orders table
-        PendingOrder pendingOrder = new PendingOrder();
-        pendingOrder.setUser(user);
-//        pendingOrder.setCart(cartToOrder);
-        pendingOrder.setToken(token);
-        pendingOrder.setCreatedOn(new Date());
-        //update user field
-        user.addPendingOrder(pendingOrder);
-        user.setAuthenticationToken(token);
-
-        // Get total price of items in cart
-        double totalPrice =9;
-
-        //send order details email
-        emailService.sendOrderTrackingMail(emailAddressDTO.getEmailAddress(),token);
-
-//        //reset fields and persist
-//        user.resetUserCart();
-//        pendingOrderRepository.save(pendingOrder);
-//        otpRepository.save(OTP);
-//        cartRepository.save(cartToOrder);
-        userRepository.save(user);
-        return ResponseEntity.ok("Order Placed. An order tracking code has been sent to your" +
-                "registered email address. Total cost is " + totalPrice);
+            throw new UserIDNotFoundException(userId);
     }
 
     @Override
