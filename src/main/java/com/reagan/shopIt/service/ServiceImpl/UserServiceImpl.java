@@ -257,7 +257,7 @@ public class UserServiceImpl implements UserService {
 
        userRepository.updateUser(updateUserDTO.getFirstName(), updateUserDTO.getLastName(),
                updateUserDTO.getAddress(), updateUserDTO.getCity(), updateUserDTO.getState(),
-               country.getId(), updateUserDTO.getPhoneNumber(), id);
+               country.getId(), updateUserDTO.getPhoneNumber(), new Date(), id);
         return ResponseEntity.ok("Hello " + updateUserDTO.getFirstName() + ", Your update operation is successful");
     }
 
@@ -347,7 +347,7 @@ public class UserServiceImpl implements UserService {
         if (myCart.isPresent()) {
             Cart cart = myCart.get();
             cart.setQuantity(cart.getQuantity() + addCartItemsDTO.getUnit());
-            cart.setTotalCost(cart.getUnitCost() * cart.getQuantity());
+            cart.setRoundedTotalCost(cart.getUnitCost() * cart.getQuantity());
             cartRepository.save(cart);
         } else {
             Cart newCart = new Cart();
@@ -355,11 +355,9 @@ public class UserServiceImpl implements UserService {
             newCart.setUser(user);
             newCart.setQuantity(addCartItemsDTO.getUnit());
             newCart.setUnitCost(item.getPrice());
-            newCart.setTotalCost(newCart.getUnitCost() * newCart.getQuantity());
+            newCart.setRoundedTotalCost(newCart.getUnitCost() * newCart.getQuantity());
             cartRepository.save(newCart);
         }
-        item.setQuantity(item.getQuantity() - addCartItemsDTO.getUnit());
-        itemRepository.save(item);
     }
 
     @Override
@@ -376,9 +374,7 @@ public class UserServiceImpl implements UserService {
             if (optionalCart.isPresent()) {
                 Cart myCartItem = optionalCart.get();
                 myCartItem.setUser(null);
-                item.setQuantity(item.getQuantity() + myCartItem.getQuantity());
 
-                itemRepository.save(item);
                 cartRepository.delete(myCartItem);
                 return myCartItem.getItem().getName() + " removed from cart";
             }
@@ -438,9 +434,14 @@ public class UserServiceImpl implements UserService {
         PendingOrder pendingOrder = new PendingOrder();
 
         for (Cart cart : myCartItems) {
+            if (cart.getQuantity() > cart.getItem().getQuantity()) {
+                throw new ItemNotFoundException(cart.getItem().getName());
+            }
+            cart.getItem().setQuantity(cart.getItem().getQuantity() - cart.getQuantity());
+            itemRepository.save(cart.getItem());
+
             totalCost += cart.getTotalCost();
 
-            pendingOrder.addCartItem(cart);
         }
         pendingOrder.setCost(totalCost);
         pendingOrder.setConfirmed(false);
@@ -465,9 +466,10 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new PendingOrderNotFoundException(id, userId));
 
         if (pendingOrder.getConfirmed()) {
-            throw new IllegalArgumentException("Pending order already confirmed");
+            throw new IllegalArgumentException("confirm order reception mail already sent");
         }
         pendingOrder.setConfirmed(true);
+        pendingOrder.setUpdatedOn(new Date());
 
         String token =  pendingOrder.getToken();
 

@@ -30,13 +30,14 @@ public class RoleController {
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<?> deleteRole(@Validated @RequestBody UserRoleDTO roleDTO) {
-        return roleService.deleteRole(roleDTO);
+    public ResponseEntity<?> deleteRole(@RequestParam("id") Long roleId) {
+        return roleService.deleteRole(roleId);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateRoleDetails(@Validated @RequestBody UpdateUserRoleDTO roleDTO) {
-        return roleService.updateRole(roleDTO);
+    public ResponseEntity<?> updateRoleDetails(@RequestParam("id") Long id,
+                                               @Validated @RequestBody UpdateUserRoleDTO roleDTO) {
+        return roleService.updateRole(id, roleDTO);
     }
 
     @GetMapping("/get-all")

@@ -46,31 +46,32 @@ public class RoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> updateRole(UpdateUserRoleDTO updateUserRoleDTO) {
-        Optional<UserRole> userRole = roleRepository.findByTitle(updateUserRoleDTO.getOldTitle());
-        if (userRole.isEmpty()) {
-            throw new UserRoleNotFoundException(updateUserRoleDTO.getOldTitle());
-        }
-        userRole.get().setTitle(updateUserRoleDTO.getNewTitle());
-        userRole.get().setCode(updateUserRoleDTO.getCode());
-        userRole.get().setUpdatedOn(new Date());
+    public ResponseEntity<?> updateRole(Long id, UpdateUserRoleDTO updateUserRoleDTO) {
+        UserRole userRole = roleRepository.findById(id).orElseThrow(
+                () -> new UserRoleNotFoundException(id)
+        );
+
+        userRole.setTitle(updateUserRoleDTO.getNewTitle());
+        userRole.setCode(updateUserRoleDTO.getCode());
+        userRole.setUpdatedOn(new Date());
 
         //save updated role
-        roleRepository.save(userRole.get());
+        roleRepository.save(userRole);
         return ResponseEntity.ok("Role updated successfully");
     }
 
     @Override
     @Transactional
-    public ResponseEntity<?> deleteRole(UserRoleDTO userRoleDTO) {
-        Optional<UserRole> roleExists = roleRepository.findByTitleAndCode(userRoleDTO.getTitle(),
-                userRoleDTO.getCode());
-        roleExists.ifPresent(roleRepository::delete);
+    public ResponseEntity<?> deleteRole(Long roleId) {
+        UserRole role = roleRepository.findById(roleId).orElseThrow(
+                () -> new UserRoleNotFoundException(roleId));
+
+        roleRepository.delete(role);
         return ResponseEntity.status(HttpStatus.OK).body("Role deleted");
     }
 
     @Override
     public List<UserRole> getAllRoles() {
-        return roleRepository.getAllRoles();
+        return roleRepository.findAll();
     }
 }

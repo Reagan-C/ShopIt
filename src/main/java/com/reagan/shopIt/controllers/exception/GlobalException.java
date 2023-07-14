@@ -61,7 +61,7 @@ public class GlobalException {
                 errors.put("message", ex.getMessage());
                 ex.setCode(HttpStatus.CONFLICT.value());
                 errors.put("code", ex.getCode().toString());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -72,7 +72,7 @@ public class GlobalException {
                 errors.put("message", ex.getMessage());
                 ex.setCode(HttpStatus.NOT_FOUND.value());
                 errors.put("code", ex.getCode().toString());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.CONFLICT)
@@ -83,7 +83,7 @@ public class GlobalException {
                 errors.put("message", ex.getMessage());
                 ex.setCode(HttpStatus.CONFLICT.value());
                 errors.put("code", ex.getCode().toString());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -130,17 +130,6 @@ public class GlobalException {
                 return body;
         }
 
-        @ResponseStatus(HttpStatus.CONFLICT)
-        @ExceptionHandler(UserAlreadyExistsException.class)
-        public Object exists(UserAlreadyExistsException ex) {
-                final Map<String, Object> errors = new HashMap<String, Object>();
-                errors.put("entityName", UserAlreadyExistsException.ENTITY_NAME);
-                errors.put("message", ex.getMessage());
-                ex.setCode(HttpStatus.CONFLICT.value());
-                errors.put("code", ex.getCode().toString());
-                return errors;
-        }
-
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         @ExceptionHandler(InvalidOtpException.class)
         public Object otp(InvalidOtpException ex) {
@@ -148,7 +137,7 @@ public class GlobalException {
                 errors.put("entityName", "User");
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.BAD_REQUEST.value());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
@@ -157,7 +146,7 @@ public class GlobalException {
                 final Map<String, Object> errors = new HashMap<String, Object>();
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.NOT_ACCEPTABLE.value());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
@@ -166,14 +155,6 @@ public class GlobalException {
                 final Map<String, Object> errors = new HashMap<String, Object>();
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.NOT_ACCEPTABLE.value());
-                return errors;
-        }
-        @ResponseStatus(HttpStatus.FORBIDDEN)
-        @ExceptionHandler(InsufficientDaysBeforeUpdateException.class)
-        public Object invalidTime(InsufficientDaysBeforeUpdateException ex) {
-                final Map<String, Object> errors = new HashMap<String, Object>();
-                errors.put("message", ex.getMessage());
-                errors.put("code", HttpStatus.FORBIDDEN.value());
                 return errors;
         }
 
@@ -186,12 +167,22 @@ public class GlobalException {
                 return errors;
         }
 
+        @ResponseStatus(HttpStatus.FORBIDDEN)
+        @ExceptionHandler(InsufficientDaysBeforeUpdateException.class)
+        public Object invalidTime(InsufficientDaysBeforeUpdateException ex) {
+                final Map<String, Object> errors = new HashMap<String, Object>();
+                errors.put("message", ex.getMessage());
+                errors.put("code", HttpStatus.FORBIDDEN.value());
+                return errors;
+        }
+
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         @ExceptionHandler(DataIntegrityViolationException.class)
         public Object unique(DataIntegrityViolationException ex) {
                 final Map<String, Object> errors = new HashMap<>();
                 errors.put("entityName", "Unknown");
-                errors.put("message", "The referenced entity id does not exist, all existent and new entities field must be unique and referenced ids must exist.");
+                errors.put("message", "The referenced entity id does not exist, all existent and new entities field" +
+                        " must be unique and referenced ids must exist.");
                 errors.put("code" , Integer.toString(HttpStatus.BAD_REQUEST.value()));
                 return errors;
         }
@@ -213,6 +204,17 @@ public class GlobalException {
                 errors.put("entityName", "Authentication");
                 errors.put("message", "Username or password incorrect");
                 errors.put("code" , Integer.toString(HttpStatus.BAD_REQUEST.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.CONFLICT)
+        @ExceptionHandler(UserAlreadyExistsException.class)
+        public Object exists(UserAlreadyExistsException ex) {
+                final Map<String, Object> errors = new HashMap<String, Object>();
+                errors.put("entityName", UserAlreadyExistsException.ENTITY_NAME);
+                errors.put("message", ex.getMessage());
+                ex.setCode(HttpStatus.CONFLICT.value());
+                errors.put("code", ex.getCode().toString());
                 return ex.getMessage();
         }
 

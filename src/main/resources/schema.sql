@@ -79,6 +79,7 @@
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `confirmed` BOOLEAN NOT NULL DEFAULT FALSE,
         `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `updated_on` TIMESTAMP  DEFAULT NULL,
         `token` VARCHAR (255),
         `cost` DOUBLE NOT NULL,
         `user_id` BIGINT,

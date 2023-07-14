@@ -25,10 +25,6 @@ public class PendingOrder {
     @JoinColumn(name = "user_id")
     private User user;
 
-
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Cart> cartList = new ArrayList<>();
-
     @Column(name = "token")
     private String token;
 
@@ -39,9 +35,9 @@ public class PendingOrder {
     @Column(name = "created_on", updatable = false, nullable = false)
     private Date createdOn;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_on")
+    private Date updatedOn;
 
-    public void addCartItem(Cart cart) {
-        cartList.add(cart);
-    }
 }
 

@@ -3,7 +3,6 @@ package com.reagan.shopIt.model.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.*;
 
 
 @Getter
@@ -28,5 +27,7 @@ public class Cart {
     private double unitCost;
     private double totalCost;
 
-
+    public void setRoundedTotalCost(double cost) {
+        this.totalCost = Math.round(cost * 100)/100.0;
+    }
 }

@@ -11,11 +11,6 @@ import lombok.*;
 @Setter
 @Builder
 public class UpdateUserRoleDTO {
-
-
-    @Transient
-    @NotBlank(message = "{role.title.notBlank}")
-    private String oldTitle;
     @JsonProperty("title")
     @NotBlank(message = "{role.title.notBlank}")
     private String newTitle;

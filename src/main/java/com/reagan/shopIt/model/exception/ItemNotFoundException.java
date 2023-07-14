@@ -13,7 +13,8 @@ public class ItemNotFoundException extends ShopItException{
 
     @Override
     public String getMessage() {
-        return String.format("%s with this name %s is out of stock",
-                ENTITY_NAME, name.toString());
+        return String.format("we currently do not have enough quantity of %s to satisfy " +
+                        "your request",
+                name.toString());
     }
 }

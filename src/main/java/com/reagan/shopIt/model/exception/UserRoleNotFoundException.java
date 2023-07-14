@@ -12,7 +12,7 @@ public class UserRoleNotFoundException extends ShopItException{
 
     @Override
     public String getMessage() {
-        return String.format("%s with this title %s cannot be found or does not exist in our record",
+        return String.format("%s with this ID %s cannot be found or does not exist in our record",
                 ENTITY_NAME, roleId.toString());
     }
 }

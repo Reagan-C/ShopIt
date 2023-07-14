@@ -11,9 +11,6 @@ import java.util.Optional;
 @Repository
 public interface RoleRepository extends JpaRepository<UserRole, Long> {
 
-    @Query(value = "select i from UserRole i", nativeQuery = true)
-    List<UserRole> getAllRoles();
-
     Optional<UserRole> findByTitleAndCode(String title, String code);
 
     Optional<UserRole> findByTitle(String code);
