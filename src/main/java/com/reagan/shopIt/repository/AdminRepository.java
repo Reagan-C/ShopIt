@@ -11,11 +11,11 @@ import java.util.List;
 @Repository
 public interface AdminRepository extends JpaRepository<Admin, Long> {
 
-    @Query(value = "select i from Admin i", nativeQuery = true)
+    @Query(value = "select i.* from admin i order by id asc", nativeQuery = true)
     List<Admin> getAllAdmins();
 
-    Boolean existsByUserEmail(String userEmailAddress);
+    Boolean existsByUserEmail(String emailAddress);
 
-    Admin findByUserEmail(String userEmailAddress);
+    Admin findByUserEmail(String emailAddress);
 
 }

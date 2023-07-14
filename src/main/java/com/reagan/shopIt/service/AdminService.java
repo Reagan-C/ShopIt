@@ -1,7 +1,8 @@
 package com.reagan.shopIt.service;
 
+import com.reagan.shopIt.model.domain.Admin;
 import com.reagan.shopIt.model.domain.User;
-import com.reagan.shopIt.model.dto.admindto.AdminDTO;
+import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 
@@ -10,12 +11,12 @@ import java.util.List;
 public interface AdminService {
 
     @Transactional
-    ResponseEntity<?> addUserToAdmin(AdminDTO adminDTO);
+    ResponseEntity<?> addUserToAdmin(EmailAddressDTO email);
 
     @Transactional
-    ResponseEntity<?> removeUserFromAdmin(AdminDTO adminDTO);
+    ResponseEntity<?> removeUserFromAdmin(EmailAddressDTO email);
 
-    List<String> getAllAdmins();
+    List<Admin> getAllAdmins();
 
-    User findUser (AdminDTO adminDTO);
+    List<User> findUser (EmailAddressDTO email);
 }

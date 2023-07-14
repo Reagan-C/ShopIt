@@ -2,7 +2,9 @@ package com.reagan.shopIt.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,5 +32,10 @@ public class Admin {
 
     @Column(name = "user_last_name")
     private String userLastName;
+
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "made_admin_on", updatable = false, nullable = false)
+    private Date createdOn;
 
 }

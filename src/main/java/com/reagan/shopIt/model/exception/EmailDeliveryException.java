@@ -7,6 +7,6 @@ public class EmailDeliveryException extends ShopItException {
 
     @Override
     public String getMessage() {
-        return String.format("%s message delivery failed and error has occurred.", ENTITY_NAME);
+        return String.format(" An error  occurred and %s message delivery has failed", ENTITY_NAME);
     }
 }

@@ -1,7 +1,7 @@
 package com.reagan.shopIt.controllers.admin;
 
 import com.reagan.shopIt.model.domain.User;
-import com.reagan.shopIt.model.dto.admindto.AdminDTO;
+import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.service.AdminService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,13 +24,13 @@ public class AdminController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addUserToAdmin(@Validated @RequestBody AdminDTO adminDTO) {
-           return adminService.addUserToAdmin(adminDTO);
+    public ResponseEntity<?> addUserToAdmin(@Validated @RequestBody EmailAddressDTO email) {
+           return adminService.addUserToAdmin(email);
     }
 
     @DeleteMapping("/remove")
-    public ResponseEntity<?> removeAdmin(@Validated @RequestBody AdminDTO adminDTO) {
-        return adminService.removeUserFromAdmin(adminDTO);
+    public ResponseEntity<?> removeAdmin(@Validated @RequestBody EmailAddressDTO email) {
+        return adminService.removeUserFromAdmin(email);
     }
 
     @GetMapping("/get-all")
@@ -39,8 +39,8 @@ public class AdminController {
     }
 
     @GetMapping("/find-admin")
-    public User findAdmin(@Validated @RequestBody AdminDTO adminDTO) {
-        return adminService.findUser(adminDTO);
+    public List<User> findAdmin(@Validated @RequestBody EmailAddressDTO email) {
+        return adminService.findUser(email);
     }
 
 }

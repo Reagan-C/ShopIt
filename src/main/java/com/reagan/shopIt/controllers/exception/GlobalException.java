@@ -53,6 +53,16 @@ public class GlobalException {
                 return errors;
         }
 
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(CountryIDNotFoundException.class)
+        public Object notFound(CountryIDNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Country ID");
+                errors.put("message", "Country ID not found");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
+
         @ResponseStatus(HttpStatus.CONFLICT)
         @ExceptionHandler(CountryDuplicateEntityException.class)
         public Object duplicate(CountryDuplicateEntityException ex) {
@@ -155,7 +165,7 @@ public class GlobalException {
                 final Map<String, Object> errors = new HashMap<String, Object>();
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.NOT_ACCEPTABLE.value());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
@@ -164,7 +174,7 @@ public class GlobalException {
                 final Map<String, Object> errors = new HashMap<String, Object>();
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.NOT_ACCEPTABLE.value());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.FORBIDDEN)
@@ -173,7 +183,7 @@ public class GlobalException {
                 final Map<String, Object> errors = new HashMap<String, Object>();
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.FORBIDDEN.value());
-                return errors;
+                return ex.getMessage();
         }
 
         @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -288,13 +298,95 @@ public class GlobalException {
                 return ex.getMessage();
         }
 
-        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ResponseStatus(HttpStatus.CONFLICT)
         @ExceptionHandler(CategoryExistsException.class)
         public Object exists(CategoryExistsException ex) {
                 final Map<String, Object> errors = new HashMap<>();
                 errors.put("entityName", "Category");
                 errors.put("message", "Category already exists");
+                errors.put("code" , Integer.toString(HttpStatus.CONFLICT.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.CONFLICT)
+        @ExceptionHandler(AdminAlreadyExistsException.class)
+        public Object exists(AdminAlreadyExistsException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Admin");
+                errors.put("message", "Admin already exists");
+                errors.put("code" , Integer.toString(HttpStatus.CONFLICT.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(AdminNotFoundException.class)
+        public Object notFound(AdminNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Admin");
+                errors.put("message", "User not an admin");
                 errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
                 return ex.getMessage();
         }
+
+
+        @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+        @ExceptionHandler(EmailDeliveryException.class)
+        public Object expectationFailed(EmailDeliveryException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Email");
+                errors.put("message", "AN error occurred and message could not be delivered");
+                errors.put("code" , Integer.toString(HttpStatus.EXPECTATION_FAILED.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.CONFLICT)
+        @ExceptionHandler(EmailExistsException.class)
+        public Object exists(EmailExistsException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Email");
+                errors.put("message", "Email already exists in our record");
+                errors.put("code" , Integer.toString(HttpStatus.CONFLICT.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(EmailNotFoundException.class)
+        public Object notFound(EmailNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Email");
+                errors.put("message", "Email not found");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+        @ExceptionHandler(DateInvalidException.class)
+        public Object invalidDate(DateInvalidException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Date");
+                errors.put("message", "Invalid date format");
+                errors.put("code" , Integer.toString(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        @ExceptionHandler(JwtAuthenticationException.class)
+        public Object invalid(JwtAuthenticationException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Jwt authentication");
+                errors.put("message", "Failure while generating jwt");
+                errors.put("code" , Integer.toString(HttpStatus.UNAUTHORIZED.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.UNAUTHORIZED)
+        @ExceptionHandler(SetAuthenticationFailureException.class)
+        public Object authentication(SetAuthenticationFailureException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Authentication");
+                errors.put("message", "Can not set authentication");
+                errors.put("code" , Integer.toString(HttpStatus.UNAUTHORIZED.value()));
+                return ex.getMessage();
+        }
+
 }

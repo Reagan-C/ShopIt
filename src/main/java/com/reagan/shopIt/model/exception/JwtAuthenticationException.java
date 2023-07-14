@@ -1,7 +1,5 @@
 package com.reagan.shopIt.model.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 

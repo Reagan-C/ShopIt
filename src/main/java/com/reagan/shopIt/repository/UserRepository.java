@@ -5,6 +5,7 @@ import com.reagan.shopIt.model.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
@@ -14,14 +15,9 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
-    User findByUsernameAndPassword(String username, String password);
-
     User findByUsername(String username);
 
     User findByEmailAddress(String email);
-
-    User findByAuthenticationToken(String token);
 
     Boolean existsByEmailAddress(String emailAddress);
 
@@ -36,5 +32,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "select * from user  ORDER BY id ASC", nativeQuery = true)
     List<User> getAllUsers();
+
+    @Query(value = "select u.id, u.first_name, u.last_name, u.email from user u where u.country_id = :id order by " +
+            "u.id asc", nativeQuery = true)
+    List<Object[]> findUserByCountryId(@Param("id") Long country_id);
 }
 

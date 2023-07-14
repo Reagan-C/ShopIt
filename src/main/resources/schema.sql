@@ -6,6 +6,7 @@
         `user_email` VARCHAR(255),
         `user_first_name` VARCHAR(255),
         `user_last_name` VARCHAR(255),
+        `made_admin_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
         PRIMARY KEY (`id`)
     );
 

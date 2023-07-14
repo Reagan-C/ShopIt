@@ -18,7 +18,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "order by i.added_on asc", nativeQuery = true)
     List<Object[]> getItemsByCategoryId(@Param("id") Long category_id);
 
-    @Query(value = "select i FROM Item i where i.category.category_name = :name AND (i.createdOn BETWEEN :from AND :to)",
+    @Query(value = "select i.* FROM items i where i.category.category_name = :name AND (i.createdOn BETWEEN :from AND :to)",
     nativeQuery = true)
     Page<Item> getItems(Date from, Date to, String name, Pageable pageable);
 

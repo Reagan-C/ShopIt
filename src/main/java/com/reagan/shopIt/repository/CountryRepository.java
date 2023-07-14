@@ -11,10 +11,8 @@ import java.util.Optional;
 @Repository
 public interface CountryRepository extends JpaRepository<Country, Long> {
 
-    @Query(value = "select i from Country i", nativeQuery = true)
+    @Query(value = "select i.* from Country i order by i.title asc", nativeQuery = true)
     List<Country> getAllCountries();
-
-    Optional<Country> findByAbbreviationAndTitle(String abbreviation, String title);
 
     Country findByTitle(String nationality);
 

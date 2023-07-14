@@ -3,7 +3,7 @@ package com.reagan.shopIt.service.ServiceImpl;
 import com.reagan.shopIt.model.domain.Admin;
 import com.reagan.shopIt.model.domain.User;
 import com.reagan.shopIt.model.domain.UserRole;
-import com.reagan.shopIt.model.dto.admindto.AdminDTO;
+import com.reagan.shopIt.model.dto.emailaddressdto.EmailAddressDTO;
 import com.reagan.shopIt.model.enums.UserRoleType;
 import com.reagan.shopIt.model.exception.UserNameNotFoundException;
 import com.reagan.shopIt.repository.AdminRepository;
@@ -12,6 +12,7 @@ import com.reagan.shopIt.repository.UserRepository;
 import com.reagan.shopIt.service.AdminService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -38,14 +39,15 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> addUserToAdmin(AdminDTO adminDTO) {
+    @Modifying
+    public ResponseEntity<?> addUserToAdmin(EmailAddressDTO emailAddressDTO) {
         //check if user exists by email address
-        User user = userRepository.findByEmailAddress(adminDTO.getUserEmailAddress());
+        User user = userRepository.findByEmailAddress(emailAddressDTO.getEmailAddress());
         if (user == null) {
-            throw new UserNameNotFoundException(adminDTO.getUserEmailAddress());
+            throw new UserNameNotFoundException(emailAddressDTO.getEmailAddress());
         }
 
-        boolean isUserAnAdmin = adminRepository.existsByUserEmail(adminDTO.getUserEmailAddress());
+        boolean isUserAnAdmin = adminRepository.existsByUserEmail(emailAddressDTO.getEmailAddress());
         if (isUserAnAdmin) {
             return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body("User is already an admin");
         }
@@ -70,54 +72,55 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public ResponseEntity<?> removeUserFromAdmin(AdminDTO adminDTO) {
+    @Modifying
+    public ResponseEntity<?> removeUserFromAdmin(EmailAddressDTO body) {
         //null check on user
-        User user = userRepository.findByEmailAddress(adminDTO.getUserEmailAddress());
+        User user = userRepository.findByEmailAddress(body.getEmailAddress());
         if (user == null) {
-            throw new UserNameNotFoundException(adminDTO.getUserEmailAddress());
+            throw new UserNameNotFoundException(body.getEmailAddress());
         }
         //check if user is an admin
-        Admin admin = adminRepository.findByUserEmail(user.getEmailAddress());
+        Admin admin = adminRepository.findByUserEmail(body.getEmailAddress());
         if (admin == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User with email address " + user.getEmailAddress()
-                    + " is not an admin");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User is not an admin");
         }
-        //Remove from admins
-        adminRepository.delete(admin);
+
         Optional<UserRole> role = roleRepository.findByTitle(UserRoleType.ADMINISTRATOR.getValue());
         role.ifPresent(user::removeFromAdmin);
 
+        //Remove from admins
+        adminRepository.delete(admin);
         //Save user
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK).body("User removed as admin");
+        return ResponseEntity.status(HttpStatus.OK).body("User has been removed as admin");
         }
 
     @Override
-    public List<String> getAllAdmins() {
-        List<String> admins= new ArrayList<>();
+    public List<Admin> getAllAdmins() {
         List<Admin> adminList = adminRepository.getAllAdmins();
-        if (!adminList.isEmpty()) {
-            for (Admin admin: adminList) {
-                admins.add(admin.getUserEmail());
-            }
-            return admins;
+
+        if (adminList.isEmpty()) {
+            throw new IllegalArgumentException("No user has been made an admin yet");
         }
-        admins.add("rrrrrrrt");
-        return admins;
+        return adminList;
     }
 
     @Override
-    public User findUser(AdminDTO adminDTO) {
-        boolean userExists = userRepository.existsByEmailAddress(adminDTO.getUserEmailAddress());
+    public List<User> findUser(EmailAddressDTO body) {
+        List<User> userDetailsList = new ArrayList<>();
+
+        boolean userExists = userRepository.existsByEmailAddress(body.getEmailAddress());
         if (!userExists) {
-            throw new UserNameNotFoundException(adminDTO.getUserEmailAddress());
+            throw new UserNameNotFoundException(body.getEmailAddress());
         }
 
-        boolean isUserAnAdmin = adminRepository.existsByUserEmail(adminDTO.getUserEmailAddress());
+        boolean isUserAnAdmin = adminRepository.existsByUserEmail(body.getEmailAddress());
         if (!isUserAnAdmin) {
             throw new IllegalArgumentException("User is not an admin");
         }
 
-        return userRepository.findByEmailAddress(adminDTO.getUserEmailAddress());
+        User user = userRepository.findByEmailAddress(body.getEmailAddress());
+        userDetailsList.add(user);
+        return userDetailsList;
     }
 }

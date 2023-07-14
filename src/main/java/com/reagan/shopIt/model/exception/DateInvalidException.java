@@ -11,6 +11,7 @@ public class DateInvalidException extends ShopItException{
 
     @Override
     public String getMessage() {
-        return String.format("Supplied date, %s, is invalid. Ensure date is correct in this format: YYYY-MM-DD.", invalidDate);
+        return String.format("Supplied date, %s, is invalid. Ensure date is correct" +
+                " in this format: YYYY-MM-DD.", invalidDate);
     }
 }

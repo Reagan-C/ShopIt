@@ -36,13 +36,18 @@ public class CountryController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<?> removeCountry(@Validated @RequestBody DeleteCountryDTO countryDTO) {
-        return countryService.deleteCountry(countryDTO);
+    public ResponseEntity<?> removeCountry(@RequestParam("id") Long id) {
+        return countryService.deleteCountry(id);
     }
 
     @GetMapping("/get-all-countries")
     public List<Country> getAllCountries() {
         return countryService.getAllCountries();
+    }
+
+    @GetMapping("/get-all-users")
+    public List<Object[]> getUsersFromCountry(@RequestParam("country_id") Long id) {
+        return countryService.getAllUsersFromCountry(id);
     }
 
 }
