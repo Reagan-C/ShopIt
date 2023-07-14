@@ -14,15 +14,15 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    @Query(value = "select i from Item i where i.category.category_name = :name order by i.createdOn desc",
-    nativeQuery = true)
-    List<Item> getItemsByCategoryName(@Param("name") String categoryName);
+    @Query(value = "select i.name, i.picture, i.price  from items i where i.category_id = :id " +
+            "order by i.added_on asc", nativeQuery = true)
+    List<Object[]> getItemsByCategoryId(@Param("id") Long category_id);
 
     @Query(value = "select i FROM Item i where i.category.category_name = :name AND (i.createdOn BETWEEN :from AND :to)",
     nativeQuery = true)
     Page<Item> getItems(Date from, Date to, String name, Pageable pageable);
 
-    @Query(value = "select i from Item i", nativeQuery = true)
+    @Query(value = "select * from Item i", nativeQuery = true)
     List<Item> getAllItems();
 
     Item findByName(String name);

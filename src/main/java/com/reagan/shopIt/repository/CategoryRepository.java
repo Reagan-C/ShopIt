@@ -12,11 +12,8 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query(value = "select i from Category i", nativeQuery = true)
-    List<Category> getAllCategories();
-
-    Optional<Category> findByNameAndAbbreviation(String name, String abbreviation);
-
     Category findByName(String name);
+
+    Category findByAbbreviation(String abbreviation);
 
 }

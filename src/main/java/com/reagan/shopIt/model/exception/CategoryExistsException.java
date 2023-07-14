@@ -7,6 +7,6 @@ public class CategoryExistsException extends ShopItException{
 
     @Override
     public String getMessage() {
-        return String.format("%s already exists with this name in the record", ENTITY_NAME);
+        return String.format("%s already exists with this name or abbreviation in the record", ENTITY_NAME);
     }
 }

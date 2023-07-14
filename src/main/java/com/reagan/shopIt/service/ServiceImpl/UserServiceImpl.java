@@ -67,7 +67,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(UserRepository userRepository, FulfilledOrderRepository fulfilledOrderRepository,
                            PendingOrderRepository pendingOrderRepository, OTPRepository otpRepository,
-                           RoleRepository roleRepository, CartRepository cartRepository, OTPGenerator generator, CountryRepository countryRepository, ItemRepository itemRepository) {
+                           RoleRepository roleRepository, CartRepository cartRepository, OTPGenerator generator,
+                           CountryRepository countryRepository, ItemRepository itemRepository) {
         this.userRepository = userRepository;
         this.fulfilledOrderRepository = fulfilledOrderRepository;
         this.pendingOrderRepository = pendingOrderRepository;

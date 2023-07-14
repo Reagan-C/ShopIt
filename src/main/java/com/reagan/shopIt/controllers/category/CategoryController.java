@@ -1,8 +1,9 @@
 package com.reagan.shopIt.controllers.category;
 
 import com.reagan.shopIt.model.domain.Category;
+import com.reagan.shopIt.model.domain.Item;
 import com.reagan.shopIt.model.dto.categorydto.AddCategoryDTO;
-import com.reagan.shopIt.model.dto.categorydto.CategoryNameDTO;
+import com.reagan.shopIt.model.dto.categorydto.UpdateCategoryDTO;
 import com.reagan.shopIt.service.CategoryService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "category", produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -31,8 +33,8 @@ public class CategoryController {
 
     @PreAuthorize("hasRole('Administrator')")
     @DeleteMapping("/remove")
-    public ResponseEntity<?> removeCategory(@Validated @RequestBody CategoryNameDTO categoryDTO) {
-        return categoryService.removeCategory(categoryDTO);
+    public ResponseEntity<?> removeCategory(@RequestParam("category_id") Long categoryId) {
+        return categoryService.removeCategory(categoryId);
     }
 
     @GetMapping("/get-all")
@@ -40,9 +42,21 @@ public class CategoryController {
         return categoryService.findAllCategories();
     }
 
+    @PreAuthorize("hasRole('Administrator')")
     @GetMapping("/get")
-    public Category getByName(@Validated @RequestBody CategoryNameDTO categoryNameDTO) {
-        return categoryService.findCategoryByName(categoryNameDTO);
+    public List<Map<String, Object>> getById(@RequestParam("id") Long categoryId) {
+        return categoryService.findCategoryById(categoryId);
     }
 
+    @GetMapping("/get-items")
+    public List<Object[]> getAllItemsInCategory(@RequestParam("id") Long id) {
+        return categoryService.getAllItemsInCategory(id);
+    }
+
+    @PreAuthorize("hasRole('Administrator')")
+    @PutMapping("/update")
+    public ResponseEntity<String> updateCategory(@RequestParam("id")Long id,
+                                                 @Validated @RequestBody UpdateCategoryDTO body) {
+        return categoryService.updateCategoryDetails(id, body);
+    }
 }

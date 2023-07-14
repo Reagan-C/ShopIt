@@ -5,15 +5,15 @@ public class CategoryNotFoundException extends ShopItException{
     private static final long serialVersionUID = 1L;
     public static final String ENTITY_NAME = "Category";
 
-    private Object name = null;
+    private Object id = null;
 
-    public CategoryNotFoundException(Object name) {
-        this.name = name;
+    public CategoryNotFoundException(Object id) {
+        this.id = id;
     }
 
     @Override
     public String getMessage() {
-        return String.format("A %s with a name %s cannot be found or does not exist in our record",
-                ENTITY_NAME, name.toString());
+        return String.format("%s with  ID %s cannot be found or does not exist in our record",
+                ENTITY_NAME, id.toString());
     }
 }

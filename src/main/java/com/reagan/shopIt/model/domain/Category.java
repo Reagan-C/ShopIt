@@ -2,7 +2,10 @@ package com.reagan.shopIt.model.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,16 +26,15 @@ public class Category {
     @Column(name = "abbreviation", nullable = false)
     private String abbreviation;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private Set<Item> items = new HashSet<>();
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "added_on", updatable = false, nullable = false)
+    private Date createdOn;
 
-    //add items to category
-    public void addItemToCategory(Item item) {
-        this.getItems().add(item);
-    }
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_on")
+    private Date updatedOn;
 
-    public void removeItemFromCategory() {
-        this.setItems(new HashSet<>());
-    }
 }
 

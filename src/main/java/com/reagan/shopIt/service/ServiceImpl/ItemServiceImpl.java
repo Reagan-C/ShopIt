@@ -103,12 +103,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<?> findItemByCategory(ItemCategoryDTO itemCategoryDTO) {
-        Category category = categoryRepository.findByName(itemCategoryDTO.getCategoryName());
-        if (category == null) {
-            throw new CategoryNotFoundException(itemCategoryDTO.getCategoryName());
-        }
-        //if category exists, return all items in category
-        return itemRepository.getItemsByCategoryName(category.getName());
+//        Category category = categoryRepository.findByName(itemCategoryDTO.getCategoryName());
+//        if (category == null) {
+//            throw new CategoryNotFoundException(itemCategoryDTO.getCategoryName());
+//        }
+//        //if category exists, return all items in category
+//        return itemRepository.getItemsByCategoryName(category.getName());
+        return null;
     }
 
     @Override

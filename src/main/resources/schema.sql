@@ -16,7 +16,7 @@
         `item_id` BIGINT,
         `unit_cost` FLOAT(53) NOT NULL,
         `quantity` INTEGER NOT NULL,
-        `total_cost` FLOAT(53) NOT NULL,
+        `total_cost` DOUBLE NOT NULL,
         PRIMARY KEY (`id`)
     );
 
@@ -25,6 +25,9 @@
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `category_name` VARCHAR(255) NOT NULL,
         `abbreviation` VARCHAR(255) NOT NULL,
+        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
         PRIMARY KEY (`id`)
     );
 

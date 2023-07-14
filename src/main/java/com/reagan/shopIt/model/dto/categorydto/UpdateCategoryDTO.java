@@ -13,11 +13,14 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryNameDTO implements Serializable {
+public class UpdateCategoryDTO implements Serializable {
 
     @JsonProperty("name")
     @NotBlank(message = "{category.name.notBlank}")
     private String name;
 
+    @JsonProperty("abbreviation")
+    @NotBlank(message = "{category.abbreviation.notBlank}")
+    private String abbreviation;
 }
 

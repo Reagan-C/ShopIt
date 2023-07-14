@@ -134,7 +134,7 @@ public class GlobalException {
         @ExceptionHandler(InvalidOtpException.class)
         public Object otp(InvalidOtpException ex) {
                 final Map<String, Object> errors = new HashMap<String, Object>();
-                errors.put("entityName", "User");
+                errors.put("entityName", "Otp");
                 errors.put("message", ex.getMessage());
                 errors.put("code", HttpStatus.BAD_REQUEST.value());
                 return ex.getMessage();
@@ -252,8 +252,8 @@ public class GlobalException {
         @ExceptionHandler(CartEmptyException.class)
         public Object cartEmpty(CartEmptyException ex) {
                 final Map<String, Object> errors = new HashMap<>();
-                errors.put("entityName", "Item");
-                errors.put("message", "Item empty");
+                errors.put("entityName", "cart");
+                errors.put("message", "cart empty");
                 errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
                 return ex.getMessage();
         }
@@ -262,8 +262,8 @@ public class GlobalException {
         @ExceptionHandler(PendingOrderNotFoundException.class)
         public Object notFound(PendingOrderNotFoundException ex) {
                 final Map<String, Object> errors = new HashMap<>();
-                errors.put("entityName", "Item");
-                errors.put("message", "Item empty");
+                errors.put("entityName", "pending_order");
+                errors.put("message", "No pending order found");
                 errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
                 return ex.getMessage();
         }
@@ -274,6 +274,26 @@ public class GlobalException {
                 final Map<String, Object> errors = new HashMap<>();
                 errors.put("entityName", "Token");
                 errors.put("message", "Token empty");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(CategoryNotFoundException.class)
+        public Object notFound(CategoryNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Category");
+                errors.put("message", "Category not found");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(CategoryExistsException.class)
+        public Object exists(CategoryExistsException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Category");
+                errors.put("message", "Category already exists");
                 errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
                 return ex.getMessage();
         }
