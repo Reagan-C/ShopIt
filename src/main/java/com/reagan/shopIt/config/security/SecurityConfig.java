@@ -45,8 +45,10 @@ public class SecurityConfig {
                     .authorizeHttpRequests(auth ->
                             auth.requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
                                 .requestMatchers(HttpMethod.POST,"/api/v1/auth/log-in").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/items/get-by-name").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/category/get-items").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/test/***").permitAll()
-                                .anyRequest().permitAll()
+                                .anyRequest().authenticated()
                     );
             http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

@@ -48,6 +48,9 @@ public class Item {
     @Column(name = "updated_on")
     private Date updatedOn;
 
+    public void setNewQuantity(int quantity) {
+        this.quantity += quantity;
+    }
 }
 
 

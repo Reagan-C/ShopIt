@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ItemService {
 
@@ -21,11 +22,9 @@ public interface ItemService {
     @Transactional
     ResponseEntity<String> setItemQuantity(SetItemQuantityDTO quantityDTO);
 
-    ResponseEntity<Item> setItemNewPrice(SetItemPriceDTO priceDTO);
-
-    List<?> findItemByCategory(ItemCategoryDTO itemCategoryDTO);
+    ResponseEntity<String> setItemNewPrice(SetItemPriceDTO priceDTO);
 
     List<Item> getAllItems();
 
-    Item findByName(String itemName);
+    List<Map<String, Object>> findByName(ItemNameDTO itemName);
 }

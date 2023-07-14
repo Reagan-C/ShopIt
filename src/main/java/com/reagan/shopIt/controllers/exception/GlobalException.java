@@ -1,5 +1,6 @@
 package com.reagan.shopIt.controllers.exception;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.reagan.shopIt.model.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -407,6 +408,16 @@ public class GlobalException {
                 errors.put("message", "Can not set authentication");
                 errors.put("code" , Integer.toString(HttpStatus.UNAUTHORIZED.value()));
                 return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.BAD_REQUEST)
+        @ExceptionHandler(JsonParseException.class)
+        public Object authentication(JsonParseException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Json Parser");
+                errors.put("message", "could not parse input json");
+                errors.put("code" , Integer.toString(HttpStatus.BAD_REQUEST.value()));
+                return errors;
         }
 
 }

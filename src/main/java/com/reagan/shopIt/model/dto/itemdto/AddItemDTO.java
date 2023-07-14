@@ -26,15 +26,15 @@ public class AddItemDTO implements Serializable {
     private String description;
 
     @JsonProperty("price")
-    @NotNull(message = "{product.price.notBlank}")
-    private double price;
+    @NotNull(message = "{product.price.notNull}")
+    private Double price;
 
     @JsonProperty("picture")
     @NotBlank(message = "{product.picture.notBlank}")
     private String picture;
 
     @JsonProperty("quantity")
-    @NotNull(message = "{product.quantity.notBlank}")
+    @NotNull(message = "{product.quantity.notNull}")
     private Integer quantity;
 
     @JsonProperty("category")

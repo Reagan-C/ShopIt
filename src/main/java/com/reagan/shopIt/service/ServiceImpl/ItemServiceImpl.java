@@ -5,6 +5,7 @@ import com.reagan.shopIt.model.domain.Item;
 import com.reagan.shopIt.model.dto.itemdto.*;
 import com.reagan.shopIt.model.exception.CategoryNameNotFoundException;
 import com.reagan.shopIt.model.exception.InsufficientItemQuantityException;
+import com.reagan.shopIt.model.exception.ItemNotFoundException;
 import com.reagan.shopIt.repository.CategoryRepository;
 import com.reagan.shopIt.repository.ItemRepository;
 import com.reagan.shopIt.service.ItemService;
@@ -13,7 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ItemServiceImpl implements ItemService {
@@ -59,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<?> removeItem(DeleteItemDTO itemDTO) {
         Item item = itemRepository.findByName(itemDTO.getItemName());
         if (item == null) {
-            throw new InsufficientItemQuantityException(itemDTO.getItemName());
+            throw new ItemNotFoundException(itemDTO.getItemName());
         }
 
         itemRepository.delete(item);
@@ -70,7 +74,7 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<?> updateItem(UpdateItemDTO updateItemDTO) {
         Item item = itemRepository.findByName(updateItemDTO.getItemOldName());
         if (item == null) {
-            throw  new InsufficientItemQuantityException(updateItemDTO.getItemOldName());
+            throw  new ItemNotFoundException(updateItemDTO.getItemOldName());
         }
 
         item.setDescription(updateItemDTO.getDescription());
@@ -84,33 +88,24 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<String> setItemQuantity(SetItemQuantityDTO quantityDTO) {
         Item item = itemRepository.findByName(quantityDTO.getItemName());
         if (item == null) {
-            throw new InsufficientItemQuantityException(quantityDTO.getItemName());
+            throw new ItemNotFoundException(quantityDTO.getItemName());
         }
-        item.setQuantity(quantityDTO.getQuantity());
+
+        item.setNewQuantity(quantityDTO.getQuantity());
         itemRepository.save(item);
-        return ResponseEntity.ok("Quantity updated");
+        return ResponseEntity.ok("Quantity of " + quantityDTO.getItemName() + " updated");
     }
 
     @Override
-    public ResponseEntity<Item> setItemNewPrice(SetItemPriceDTO priceDTO) {
+    public ResponseEntity<String> setItemNewPrice(SetItemPriceDTO priceDTO) {
         Item item = itemRepository.findByName(priceDTO.getItemName());
         if (item == null) {
-            throw new InsufficientItemQuantityException(priceDTO.getItemName());
+            throw new ItemNotFoundException(priceDTO.getItemName());
         }
+
         item.setPrice(priceDTO.getPrice());
         itemRepository.save(item);
-        return ResponseEntity.ok(item);
-    }
-
-    @Override
-    public List<?> findItemByCategory(ItemCategoryDTO itemCategoryDTO) {
-//        Category category = categoryRepository.findByName(itemCategoryDTO.getCategoryName());
-//        if (category == null) {
-//            throw new CategoryIDNotFoundException(itemCategoryDTO.getCategoryName());
-//        }
-//        //if category exists, return all items in category
-//        return itemRepository.getItemsByCategoryName(category.getName());
-        return null;
+        return ResponseEntity.ok("Price of item updated");
     }
 
     @Override
@@ -123,11 +118,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item findByName(String itemName) {
-        Item item = itemRepository.findByName(itemName);
-        if (item != null){
-            return item;
+    public List<Map<String, Object>> findByName(ItemNameDTO itemName) {
+        List<Map<String, Object>> itemList = new ArrayList<>();
+        Map<String, Object> itemMap = new LinkedHashMap<>();
+
+        Item item = itemRepository.findByName(itemName.getItemName());
+        if (item == null){
+            throw new ItemNotFoundException(itemName.getItemName());
         }
-        throw new InsufficientItemQuantityException(itemName);
+
+        itemMap.put("name", item.getName());
+        itemMap.put("description", item.getDescription());
+        itemMap.put("price", item.getPrice());
+        itemMap.put("picture", item.getPicture());
+        itemMap.put("category", item.getCategory().getName());
+
+        itemList.add(itemMap);
+        return itemList;
     }
 }

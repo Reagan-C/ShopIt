@@ -10,12 +10,10 @@ import lombok.*;
 @Setter
 @Getter
 @Builder
-public class SetItemPriceDTO {
+public class ItemNameDTO {
 
     @JsonProperty("name")
     @NotBlank(message = "{product.name.notBlank}")
     private String itemName;
 
-    @NotNull(message = "{product.price.notNull}")
-    private Double price;
 }

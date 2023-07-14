@@ -22,7 +22,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     nativeQuery = true)
     Page<Item> getItems(Date from, Date to, String name, Pageable pageable);
 
-    @Query(value = "select * from Item i", nativeQuery = true)
+    @Query(value = "select * from Items", nativeQuery = true)
     List<Item> getAllItems();
 
     Item findByName(String name);
