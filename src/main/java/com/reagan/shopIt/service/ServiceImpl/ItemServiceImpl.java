@@ -3,8 +3,8 @@ package com.reagan.shopIt.service.ServiceImpl;
 import com.reagan.shopIt.model.domain.Category;
 import com.reagan.shopIt.model.domain.Item;
 import com.reagan.shopIt.model.dto.itemdto.*;
-import com.reagan.shopIt.model.exception.CategoryNotFoundException;
-import com.reagan.shopIt.model.exception.ItemNotFoundException;
+import com.reagan.shopIt.model.exception.CategoryNameNotFoundException;
+import com.reagan.shopIt.model.exception.InsufficientItemQuantityException;
 import com.reagan.shopIt.repository.CategoryRepository;
 import com.reagan.shopIt.repository.ItemRepository;
 import com.reagan.shopIt.service.ItemService;
@@ -34,16 +34,16 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<?> addNewItem(AddItemDTO addItemDTO) {
         boolean itemExists = itemRepository.existsByName(addItemDTO.getName());
         if (itemExists) {
-            throw new IllegalArgumentException(addItemDTO.getName()+ " already exists in our record");
+            throw new IllegalArgumentException(addItemDTO.getName()+ " already exists in the record");
         }
-        System.out.println("Item can be added");
+
         // check whether category name is valid
         Category itemCategory = categoryRepository.findByName(addItemDTO.getCategoryName());
         if (itemCategory == null) {
-            throw new CategoryNotFoundException(addItemDTO.getCategoryName());
+            throw new CategoryNameNotFoundException(addItemDTO.getCategoryName());
         }
+
         Item item = new Item();
-        System.out.println("item created");
         item.setCategory(itemCategory);
         item.setName(addItemDTO.getName());
         item.setPrice(addItemDTO.getPrice());
@@ -59,19 +59,20 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<?> removeItem(DeleteItemDTO itemDTO) {
         Item item = itemRepository.findByName(itemDTO.getItemName());
         if (item == null) {
-            throw new ItemNotFoundException(itemDTO.getItemName());
+            throw new InsufficientItemQuantityException(itemDTO.getItemName());
         }
+
         itemRepository.delete(item);
-        return ResponseEntity.ok("Item deleted");
+        return ResponseEntity.ok(  itemDTO.getItemName() + " entry deleted");
     }
 
     @Override
     public ResponseEntity<?> updateItem(UpdateItemDTO updateItemDTO) {
         Item item = itemRepository.findByName(updateItemDTO.getItemOldName());
         if (item == null) {
-            throw  new ItemNotFoundException(updateItemDTO.getItemOldName());
+            throw  new InsufficientItemQuantityException(updateItemDTO.getItemOldName());
         }
-        System.out.println(item.getName());
+
         item.setDescription(updateItemDTO.getDescription());
         item.setPrice(updateItemDTO.getPrice());
         item.setName(updateItemDTO.getItemNewName());
@@ -83,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<String> setItemQuantity(SetItemQuantityDTO quantityDTO) {
         Item item = itemRepository.findByName(quantityDTO.getItemName());
         if (item == null) {
-            throw new ItemNotFoundException(quantityDTO.getItemName());
+            throw new InsufficientItemQuantityException(quantityDTO.getItemName());
         }
         item.setQuantity(quantityDTO.getQuantity());
         itemRepository.save(item);
@@ -94,7 +95,7 @@ public class ItemServiceImpl implements ItemService {
     public ResponseEntity<Item> setItemNewPrice(SetItemPriceDTO priceDTO) {
         Item item = itemRepository.findByName(priceDTO.getItemName());
         if (item == null) {
-            throw new ItemNotFoundException(priceDTO.getItemName());
+            throw new InsufficientItemQuantityException(priceDTO.getItemName());
         }
         item.setPrice(priceDTO.getPrice());
         itemRepository.save(item);
@@ -105,7 +106,7 @@ public class ItemServiceImpl implements ItemService {
     public List<?> findItemByCategory(ItemCategoryDTO itemCategoryDTO) {
 //        Category category = categoryRepository.findByName(itemCategoryDTO.getCategoryName());
 //        if (category == null) {
-//            throw new CategoryNotFoundException(itemCategoryDTO.getCategoryName());
+//            throw new CategoryIDNotFoundException(itemCategoryDTO.getCategoryName());
 //        }
 //        //if category exists, return all items in category
 //        return itemRepository.getItemsByCategoryName(category.getName());
@@ -127,6 +128,6 @@ public class ItemServiceImpl implements ItemService {
         if (item != null){
             return item;
         }
-        throw new ItemNotFoundException(itemName);
+        throw new InsufficientItemQuantityException(itemName);
     }
 }

@@ -248,11 +248,21 @@ public class GlobalException {
                 return ex.getMessage();
         }
 
+        @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
+        @ExceptionHandler(InsufficientItemQuantityException.class)
+        public Object notFound(InsufficientItemQuantityException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Item");
+                errors.put("message", "Item quantity insufficient");
+                errors.put("code" , Integer.toString(HttpStatus.EXPECTATION_FAILED.value()));
+                return ex.getMessage();
+        }
+
         @ResponseStatus(HttpStatus.NOT_FOUND)
         @ExceptionHandler(ItemNotFoundException.class)
         public Object notFound(ItemNotFoundException ex) {
                 final Map<String, Object> errors = new HashMap<>();
-                errors.put("entityName", "ItemID");
+                errors.put("entityName", "Item");
                 errors.put("message", "Item not found");
                 errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
                 return ex.getMessage();
@@ -289,8 +299,18 @@ public class GlobalException {
         }
 
         @ResponseStatus(HttpStatus.NOT_FOUND)
-        @ExceptionHandler(CategoryNotFoundException.class)
-        public Object notFound(CategoryNotFoundException ex) {
+        @ExceptionHandler(CategoryIDNotFoundException.class)
+        public Object notFound(CategoryIDNotFoundException ex) {
+                final Map<String, Object> errors = new HashMap<>();
+                errors.put("entityName", "Category");
+                errors.put("message", "Category not found");
+                errors.put("code" , Integer.toString(HttpStatus.NOT_FOUND.value()));
+                return ex.getMessage();
+        }
+
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        @ExceptionHandler(CategoryNameNotFoundException.class)
+        public Object notFound(CategoryNameNotFoundException ex) {
                 final Map<String, Object> errors = new HashMap<>();
                 errors.put("entityName", "Category");
                 errors.put("message", "Category not found");

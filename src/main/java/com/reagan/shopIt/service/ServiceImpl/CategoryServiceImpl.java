@@ -4,7 +4,7 @@ import com.reagan.shopIt.model.domain.Category;
 import com.reagan.shopIt.model.dto.categorydto.AddCategoryDTO;
 import com.reagan.shopIt.model.dto.categorydto.UpdateCategoryDTO;
 import com.reagan.shopIt.model.exception.CategoryExistsException;
-import com.reagan.shopIt.model.exception.CategoryNotFoundException;
+import com.reagan.shopIt.model.exception.CategoryIDNotFoundException;
 import com.reagan.shopIt.repository.CategoryRepository;
 import com.reagan.shopIt.repository.ItemRepository;
 import com.reagan.shopIt.service.CategoryService;
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public ResponseEntity<?> removeCategory(Long id) {
        Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFoundException(id)
+                () -> new CategoryIDNotFoundException(id)
        );
 
        categoryRepository.delete(category);
@@ -76,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Map<String, Object>> findCategoryById(Long id) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFoundException(id)
+                () -> new CategoryIDNotFoundException(id)
         );
 
         List<Map<String, Object>> mapList = new ArrayList<>();
@@ -95,7 +95,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Object[]> getAllItemsInCategory(Long categoryId) {
        Category category = categoryRepository.findById(categoryId).orElseThrow(
-               () -> new CategoryNotFoundException(categoryId)
+               () -> new CategoryIDNotFoundException(categoryId)
        );
 
        List<Object[]> items = itemRepository.getItemsByCategoryId(categoryId);
@@ -109,7 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ResponseEntity<String> updateCategoryDetails(Long id, UpdateCategoryDTO body) {
         Category categoryToUpdate = categoryRepository.findById(id).orElseThrow(
-                () -> new CategoryNotFoundException(id)
+                () -> new CategoryIDNotFoundException(id)
         );
 
         categoryToUpdate.setName(body.getName());

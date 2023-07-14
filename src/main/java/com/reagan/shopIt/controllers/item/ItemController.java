@@ -27,12 +27,6 @@ public class ItemController {
         return itemService.addNewItem(addItemDTO);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
-//        ProductDTO product = itemService.findItemByCategory()
-//        return ResponseEntity.ok(product);
-//    }
-//
     @PutMapping("/update")
     public ResponseEntity<?> updateItem(@Validated @RequestBody UpdateItemDTO updateItemDTO) {
         return ResponseEntity.ok(itemService.updateItem(updateItemDTO));

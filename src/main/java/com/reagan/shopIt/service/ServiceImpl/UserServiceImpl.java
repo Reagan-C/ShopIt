@@ -340,7 +340,7 @@ public class UserServiceImpl implements UserService {
         // then check if item exists by that name and if we have item in stock
         Item item = itemRepository.findByName(addCartItemsDTO.getItemName());
         if (item == null || item.getQuantity() < addCartItemsDTO.getUnit()) {
-            throw  new ItemNotFoundException(addCartItemsDTO.getItemName());
+            throw  new InsufficientItemQuantityException(addCartItemsDTO.getItemName());
         }
         // create new cartItem object
         Optional<Cart> myCart = cartRepository.findByUserAndItem(user, item);
@@ -436,7 +436,7 @@ public class UserServiceImpl implements UserService {
 
         for (Cart cart : myCartItems) {
             if (cart.getQuantity() > cart.getItem().getQuantity()) {
-                throw new ItemNotFoundException(cart.getItem().getName());
+                throw new InsufficientItemQuantityException(cart.getItem().getName());
             }
             cart.getItem().setQuantity(cart.getItem().getQuantity() - cart.getQuantity());
             itemRepository.save(cart.getItem());

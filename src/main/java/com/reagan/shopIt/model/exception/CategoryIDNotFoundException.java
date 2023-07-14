@@ -1,13 +1,13 @@
 package com.reagan.shopIt.model.exception;
 
-public class CategoryNotFoundException extends ShopItException{
+public class CategoryIDNotFoundException extends ShopItException{
 
     private static final long serialVersionUID = 1L;
     public static final String ENTITY_NAME = "Category";
 
     private Object id = null;
 
-    public CategoryNotFoundException(Object id) {
+    public CategoryIDNotFoundException(Object id) {
         this.id = id;
     }
 
