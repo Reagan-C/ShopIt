@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             username = tokenProvider.getUsernameFromToken(token);
         } catch (IllegalArgumentException | JwtException ex) {
-            throw new JwtAuthenticationException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
+            throw new IllegalArgumentException("Invalid or expired token");
         }
 
         if (StringUtils.isEmpty(username)) {

@@ -22,7 +22,7 @@ public interface UserService {
 
     ResponseEntity<?> signOut();
 
-    String sendChangePasswordOtp(String email);
+    String sendChangePasswordOtp(EmailAddressDTO email);
 
     @Transactional
     ResponseEntity<String> changePassword(ResetPasswordDTO resetPasswordDTO);

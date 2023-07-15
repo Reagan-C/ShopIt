@@ -37,17 +37,18 @@ public class SecurityConfig {
     private  JwtAuthenticationFilter authFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
             http.csrf((AbstractHttpConfigurer::disable))
                     .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(auth ->
-                            auth.requestMatchers(HttpMethod.POST, "/api/v1/auth/register").permitAll()
-                                .requestMatchers(HttpMethod.POST,"/api/v1/auth/log-in").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/items/get-by-name").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/category/get-items").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/api/v1/test/***").permitAll()
+                            auth.requestMatchers(HttpMethod.POST, "/auth/register").permitAll()
+                                .requestMatchers(HttpMethod.POST,"/auth/log-in").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/items/get-by-name").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/category/get-items").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/auth/confirm").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/test/***").permitAll()
                                 .anyRequest().authenticated()
                     );
             http.addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class);

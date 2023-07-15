@@ -114,8 +114,8 @@ public class UserServiceImpl implements UserService {
         String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
 
         // Send email notification and save user and auth token
-//        emailService.sendAccountConfirmationMail(body.getEmailAddress(),
-//                emailService.buildEmail(body.getFirstName(), link));
+        emailService.sendAccountConfirmationMail(body.getEmailAddress(),
+                emailService.buildEmail(body.getFirstName(), link));
         userRepository.save(newUser);
         otpRepository.save(otp);
         return ResponseEntity.ok("Account created, Please log into your Email to confirm your account ");
@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         user1.setEnabled(true);
         user1.setAuthenticationToken(null);
-//        emailService.sendWelcomeMessage(user1.getEmailAddress());
+        emailService.sendWelcomeMessage(user1.getEmailAddress());
 
         userRepository.save(user1);
         otpRepository.save(confirmationToken);
@@ -181,16 +181,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String sendChangePasswordOtp(String email) {
-        User user = userRepository.findByEmailAddress(email);
+    public String sendChangePasswordOtp(EmailAddressDTO email) {
+        User user = userRepository.findByEmailAddress(email.getEmailAddress());
         if (user == null) {
             throw new UserNameNotFoundException(email);
         }
         //check if user performed update in the last 7 days and throw exception if true
-        Days daysDifference  = Days.days(user.getUpdatedOn().compareTo(new Date()));
-        if (daysDifference.isLessThan(Days.days(7))) {
-            throw new InsufficientDaysBeforeUpdateException();
-        }
+//        Days daysDifference  = Days.days(user.getUpdatedOn().compareTo(new Date()));
+//        if (daysDifference.isLessThan(Days.days(7))) {
+//            throw new InsufficientDaysBeforeUpdateException();
+//        }
         //Generate otp and send to user
         String token = generator.createPasswordResetToken();
         OTP OTP = new OTP();
@@ -201,8 +201,8 @@ public class UserServiceImpl implements UserService {
         OTP.setConfirmedAt(null);
 
         otpRepository.save(OTP);
-//        emailService.sendChangePasswordMail(email, token);
-        return "Please check your Email for otp";
+        emailService.sendChangePasswordMail(user.getEmailAddress(), user.getFirstName(), token);
+        return "Please check your email address for otp";
     }
 
     @Override
@@ -238,7 +238,7 @@ public class UserServiceImpl implements UserService {
         userRepository.save(existingUser);
         otpRepository.save(confirmationToken);
         //send email to user
-//        emailService.sendSuccessfulPasswordChangeMail(resetPasswordDTO.getEmailAddress());
+        emailService.sendSuccessfulPasswordChangeMail(existingUser.getFirstName() , existingUser.getEmailAddress());
         return ResponseEntity.ok("Password change successful");
     }
 
@@ -450,7 +450,8 @@ public class UserServiceImpl implements UserService {
         pendingOrder.setToken(token);
 
         //send order details email
-//            emailService.sendOrderTrackingMail(user.getEmailAddress(),token);
+            emailService.sendOrderTrackingMail(user.getEmailAddress(), user.getFirstName(),
+                    user.getAddress(), token, totalCost);
 
         pendingOrderRepository.save(pendingOrder);
         cartRepository.deleteByUserId(userId);
@@ -481,15 +482,15 @@ public class UserServiceImpl implements UserService {
         fulfilledOrders.setTrackingId(token);
         fulfilledOrders.addFulfilledOrder(pendingOrder);
 
-        String link = "http://localhost:8080/api/v1/orders/confirm-order?token=" + token;
+        String link = "http://localhost:8080/api/v1/user/confirm-order?token=" + token;
 
         pendingOrderRepository.save(pendingOrder);
         fulfilledOrderRepository.save(fulfilledOrders);
 
-//        emailService.sendOrderDeliveryMail(user.getEmailAddress(),
-//                emailService.buildOrderConfirmationEmail(user.getFirstName(), link));
+        emailService.sendOrderDeliveryMail(user.getEmailAddress(),
+                emailService.buildOrderConfirmationEmail(user.getFirstName(), link));
 
-        return ResponseEntity.status(HttpStatus.OK).body("Please proceed to your email account to confirm" +
+        return ResponseEntity.status(HttpStatus.OK).body("Please log in to your email address to confirm" +
                 " reception of your order with tracking ID " + token);
     }
 

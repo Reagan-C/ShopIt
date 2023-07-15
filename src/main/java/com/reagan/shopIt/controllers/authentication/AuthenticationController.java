@@ -50,7 +50,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/generate-password-reset-otp")
-    public String generatePasswordChangeOtp(@RequestParam("email") String email) {
+    public String generatePasswordChangeOtp(@RequestBody @Validated EmailAddressDTO email) {
         return userService.sendChangePasswordOtp(email);
     }
 

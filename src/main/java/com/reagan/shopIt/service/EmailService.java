@@ -10,13 +10,13 @@ public interface EmailService {
     void sendAccountConfirmationMail(String emailAddress, String otp);
 
     @Async
-    void sendChangePasswordMail(String email, String otp);
+    void sendChangePasswordMail(String email, String name, String otp);
 
     @Async
-    void sendSuccessfulPasswordChangeMail(String email);
+    void sendSuccessfulPasswordChangeMail(String name, String email);
 
     @Async
-    void sendOrderTrackingMail(String email, String orderTrackingCode);
+    void sendOrderTrackingMail(String email, String name, String address, String orderTrackingCode, double cost);
 
     @Async
     void sendOrderDeliveryMail(String email, String orderTrackingCode);
