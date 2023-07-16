@@ -39,7 +39,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-            http.csrf((AbstractHttpConfigurer::disable))
+            http.csrf(AbstractHttpConfigurer::disable)
                     .exceptionHandling(exception -> exception.authenticationEntryPoint(authEntryPoint))
                     .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                     .authorizeHttpRequests(auth ->
@@ -47,7 +47,8 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/auth/log-in").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/items/get-by-name").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/category/get-items").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/auth/confirm").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/auth/confirm").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/user/confirm-order").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/test/***").permitAll()
                                 .anyRequest().authenticated()
                     );

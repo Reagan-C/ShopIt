@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         user1.setEnabled(true);
         user1.setAuthenticationToken(null);
-        emailService.sendWelcomeMessage(user1.getEmailAddress());
+        emailService.sendWelcomeMessage(user1.getFirstName());
 
         userRepository.save(user1);
         otpRepository.save(confirmationToken);
@@ -162,6 +162,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> authenticate(SignInDTO body) {
+
+        User user = userRepository.findByEmailAddress(body.getEmailAddress());
+        if (user == null) {
+            throw new UserNameNotFoundException(body.getEmailAddress());
+        }
+
+        if (user.getEnabled().equals(false)) {
+            throw new IllegalArgumentException("Please confirm account first");
+        }
+
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getEmailAddress(),
                     body.getPassword()));

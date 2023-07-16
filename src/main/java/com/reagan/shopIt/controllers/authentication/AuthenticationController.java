@@ -34,7 +34,7 @@ public class AuthenticationController {
         return userService.getUserRoles(dto);
     }
 
-    @GetMapping("/confirm")
+    @PostMapping("/confirm")
     public ResponseEntity<String> confirmSignUp(@RequestParam("token") UUID token) {
         return userService.confirmSignUpToken(token);
     }
