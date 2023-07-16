@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class ResetPasswordDTO implements Serializable {
 
     @JsonProperty("email")
+    @NotBlank(message = "{user.email.notBlank}")
     @Email(message = "{user.email.valid}")
     private String emailAddress;
 

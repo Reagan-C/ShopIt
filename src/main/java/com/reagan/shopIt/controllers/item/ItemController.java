@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "items", produces = {MediaType.APPLICATION_JSON_VALUE},
-                consumes = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "items", produces = {MediaType.APPLICATION_JSON_VALUE})
 @PreAuthorize("hasRole('Administrator')")
 public class ItemController {
     private final ItemService itemService;

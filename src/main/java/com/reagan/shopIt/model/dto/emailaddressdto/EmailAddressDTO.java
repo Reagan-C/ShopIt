@@ -13,6 +13,7 @@ import lombok.*;
 public class EmailAddressDTO {
 
     @JsonProperty("emailAddress")
+    @NotBlank(message = "{user.email.notBlank}")
     @Email(message = "{user.email.valid}")
     private String emailAddress;
 

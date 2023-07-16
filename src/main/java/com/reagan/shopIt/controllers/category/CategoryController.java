@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "category", produces = {MediaType.APPLICATION_JSON_VALUE},
-                consumes = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "category", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class CategoryController {
 
     private final CategoryService categoryService;

@@ -44,14 +44,15 @@ public class JwtTokenProvider implements Serializable {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith (key)
+                .signWith(key)
                 .compact();
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
         try {
-            String username = getUsernameFromToken(token);
             boolean checkToken = isTokenExpired(token);
+            String username = getUsernameFromToken(token);
+
             return (username.equals(userDetails.getUsername()) && !checkToken);
         } catch (JwtException | IllegalArgumentException e) {
             throw new JwtAuthenticationException("Invalid or expired token", HttpStatus.UNAUTHORIZED);
@@ -76,6 +77,5 @@ public class JwtTokenProvider implements Serializable {
                 .getBody()
                 .getSubject();
     }
-
 
 }

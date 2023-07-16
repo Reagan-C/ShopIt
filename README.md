@@ -2,8 +2,19 @@
 
 **Description:**
 
-You shop in malls and you get tired of constantly going to the mall physically to buy items. You wish you can order for items. Here ShopIt steps in. With your internet enabled device, you just log and and select all the items you want and pay for them and your order will be delivered to you 
+This project encompasses all the basic functions of an e-commerce website and more. When the user signs up, an email with a link is sent to the user to confirm the account. The user cant log in till he/she confirms the account. The link is active only for a short while(20 minutes).
+JWT is used for security configuration.
+When a user places an order, the cart which holds a record of all the items in the order is cleared. The order placed is added to the pending orders list.
+When the order is delivered, the admin sends an email to the user to confirm order reception.
+When the user clicks on this link, a gratitude message is returned to him and this order is stored in the fulfilled orders table.
+There are a host of various other functions which only a user with the role Admin is capable of performing.
 
+An API documentation with a link to POSTMAN is embedded below;
+
+
+
+**API Documentation**
+-  [Rest APIs](https://www.postman.com/shopit121/workspace/shopit/collection/24452852-1b980d67-3e39-4d33-9c14-79a148357c79)
 
 
 **Project Development Requirement**
@@ -13,8 +24,9 @@ You shop in malls and you get tired of constantly going to the mall physically t
 - Database: MySQL
 - API Documentation: Postman 
 - SQL Viewer or GUI: MySQL Workbench
-- IDE: IntelliJ or VS Code
+- IDE: IntelliJ 
 - Lombok
+
 
 **Downloads and References**
 - [Enable Annotation Processing Lombok](https://www.google.com/search?q=enable+annotation+processing+lombok&oq=enab&aqs=chrome.0.69i59j69i57j69i59l2j0i433i512j46i433i512j69i65l2.1915j0j7&sourceid=chrome&ie=UTF-8)
@@ -61,27 +73,16 @@ You shop in malls and you get tired of constantly going to the mall physically t
 
 
 #### Code Convention and Naming Standards
-- Controller e.g. UserController or AuthenticationController or AuthController
+- Controller e.g. UserController or AuthenticationController 
 - Service e.g. UserService or ProductService
 - Service Implementation e.g. UserServiceImpl or EmailServiceImpl
 - Repository e.g. UserRepository
 - Repository Implementation e.g. UserRepositoryImpl
-- Validator e.g. PhoneNumberValidator
-- Validator Implementation .e.g PhoneNumberAddressValidatorImpl
+- Validator e.g. PhoneNumber
+- Validator Implementation .e.g PhoneNumberValidator
 - Utility e.g. JwtUtil
 - Configuration e.g. SecurityConfig
 - Exception e.g. UserNotFoundException or EmailAddressNotFoundException or EmailAddressExistsException
-
-**Description**
-
-
-
-- Controller class should be annotated with @RestController and @RequestMapping. The base mapping url of any controller should be the name of the entity they are creating a controller for. For instance, if you are creating an AuthenticationController, the base url should be @RequestMapping("/authentication") or @RequestMapping("/auth"). This class will contain HTTP Request handling logic.
-
-- Service class should be annotated with @Service. This class will contain business related logic for Apply For me. Exceptions should be throwned in this classes.
-
-- Repository class should be annotated with @Repository. This class will contain logic that relates to data persistence and management.
-
 
 **Spring Dependency Injection**
 

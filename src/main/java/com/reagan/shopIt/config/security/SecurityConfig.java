@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -22,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -47,8 +50,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST,"/auth/log-in").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/items/get-by-name").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/category/get-items").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/auth/confirm").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/user/confirm-order").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/confirm/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/test/***").permitAll()
                                 .anyRequest().authenticated()
                     );

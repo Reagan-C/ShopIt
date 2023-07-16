@@ -113,7 +113,6 @@ public class GlobalException {
         public Object unauthorized(AuthenticationException ex, HttpServletRequest request) {
                 final Map<String, Object> body = new HashMap<>();
                 body.put("error", "Unauthorized");
-                body.put("path", request.getServletPath());
                 body.put("message", ex.getMessage());
                 body.put("code", String.valueOf(HttpStatus.UNAUTHORIZED.value()));
                 return body;
@@ -355,7 +354,7 @@ public class GlobalException {
         public Object expectationFailed(EmailDeliveryException ex) {
                 final Map<String, Object> errors = new HashMap<>();
                 errors.put("entityName", "Email");
-                errors.put("message", "AN error occurred and message could not be delivered");
+                errors.put("message", "An error occurred and message could not be delivered");
                 errors.put("code" , Integer.toString(HttpStatus.EXPECTATION_FAILED.value()));
                 return ex.getMessage();
         }
@@ -407,7 +406,7 @@ public class GlobalException {
                 errors.put("entityName", "Authentication");
                 errors.put("message", "Can not set authentication");
                 errors.put("code" , Integer.toString(HttpStatus.UNAUTHORIZED.value()));
-                return ex.getMessage();
+                return errors;
         }
 
         @ResponseStatus(HttpStatus.BAD_REQUEST)

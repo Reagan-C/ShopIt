@@ -111,7 +111,7 @@ public class UserServiceImpl implements UserService {
         newUser.setAuthenticationToken(token);
 
         // create link,  calling the confirm token api
-        String link = "http://localhost:8080/api/v1/auth/confirm?token=" + token;
+        String link = "http://localhost:8080/api/v1/confirm/confirm-sign-up?token=" + token;
 
         // Send email notification and save user and auth token
         emailService.sendAccountConfirmationMail(body.getEmailAddress(),
@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         user1.setEnabled(true);
         user1.setAuthenticationToken(null);
-        emailService.sendWelcomeMessage(user1.getFirstName());
+        emailService.sendWelcomeMessage(user1.getEmailAddress(),user1.getFirstName());
 
         userRepository.save(user1);
         otpRepository.save(confirmationToken);
@@ -162,22 +162,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> authenticate(SignInDTO body) {
-
-        User user = userRepository.findByEmailAddress(body.getEmailAddress());
-        if (user == null) {
-            throw new UserNameNotFoundException(body.getEmailAddress());
-        }
-
-        if (user.getEnabled().equals(false)) {
-            throw new IllegalArgumentException("Please confirm account first");
-        }
-
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getEmailAddress(),
                     body.getPassword()));
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
-            throw new IllegalArgumentException(" Authentication Failure");
         }
         String jwt =  tokenProvider.generateJwtToken(body.getEmailAddress());
         return ResponseEntity.ok().body("Login successful " + jwt);
@@ -197,10 +186,10 @@ public class UserServiceImpl implements UserService {
             throw new UserNameNotFoundException(email);
         }
         //check if user performed update in the last 7 days and throw exception if true
-//        Days daysDifference  = Days.days(user.getUpdatedOn().compareTo(new Date()));
-//        if (daysDifference.isLessThan(Days.days(7))) {
-//            throw new InsufficientDaysBeforeUpdateException();
-//        }
+        Days daysDifference  = Days.days(user.getUpdatedOn().compareTo(new Date()));
+        if (daysDifference.isLessThan(Days.days(7))) {
+            throw new InsufficientDaysBeforeUpdateException();
+        }
         //Generate otp and send to user
         String token = generator.createPasswordResetToken();
         OTP OTP = new OTP();
@@ -492,7 +481,7 @@ public class UserServiceImpl implements UserService {
         fulfilledOrders.setTrackingId(token);
         fulfilledOrders.addFulfilledOrder(pendingOrder);
 
-        String link = "http://localhost:8080/api/v1/user/confirm-order?token=" + token;
+        String link = "http://localhost:8080/api/v1/confirm/confirm-order?token=" + token;
 
         pendingOrderRepository.save(pendingOrder);
         fulfilledOrderRepository.save(fulfilledOrders);

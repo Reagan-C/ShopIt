@@ -20,9 +20,5 @@ public class JwtConfig {
 
     private String header;
 
-    private String cookieName;
-
-    private long tokenValidity;
-
 }
 

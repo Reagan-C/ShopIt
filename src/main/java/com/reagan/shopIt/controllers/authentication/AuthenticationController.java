@@ -7,6 +7,7 @@ import com.reagan.shopIt.model.dto.userdto.SignUpDTO;
 import com.reagan.shopIt.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(value = "/auth", produces = {MediaType.APPLICATION_JSON_VALUE},
-                consumes = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "/auth", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class AuthenticationController {
 
     private final UserService userService;
@@ -29,14 +29,10 @@ public class AuthenticationController {
         return userService.register(body);
     }
 
+    @PreAuthorize("hasRole('Administrator')")
     @GetMapping("/get-role")
     public List<String> getUserRoles(@RequestBody EmailAddressDTO dto) {
         return userService.getUserRoles(dto);
-    }
-
-    @PostMapping("/confirm")
-    public ResponseEntity<String> confirmSignUp(@RequestParam("token") UUID token) {
-        return userService.confirmSignUpToken(token);
     }
 
     @PostMapping("/log-in")

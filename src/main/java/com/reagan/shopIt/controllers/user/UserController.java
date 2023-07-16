@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "user", produces = {MediaType.APPLICATION_JSON_VALUE},
-                consumes = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "user", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class UserController {
     private final UserService userService;
 
@@ -61,11 +60,6 @@ public class UserController {
     public ResponseEntity<?> sendOrderConfirmationMail(@RequestParam("id") Long id,
                                                        @RequestParam("user_id")Long userId) {
         return userService.confirmOrderReceptionMail(id, userId);
-    }
-
-    @PostMapping("/confirm-order")
-    public String confirmOrder(@RequestParam("token") String token) {
-        return userService.confirmOrder(token);
     }
 
     @GetMapping("/get-cart")

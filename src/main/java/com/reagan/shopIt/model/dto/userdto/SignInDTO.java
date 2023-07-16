@@ -16,6 +16,7 @@ import java.io.Serializable;
 public class SignInDTO implements Serializable {
 
     @JsonProperty("email")
+    @NotBlank(message = "{user.email.notBlank}")
     @Email(message = "{user.email.valid}")
     private String emailAddress;
 

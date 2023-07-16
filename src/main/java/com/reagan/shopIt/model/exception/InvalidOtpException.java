@@ -7,7 +7,7 @@ public class InvalidOtpException extends ShopItException {
 
     @Override
     public String getMessage() {
-        return String.format("%s OTP code is invalid", ENTITY_NAME);
+        return "The OTP in your request has exhausted its validity";
     }
 
 }

@@ -1,6 +1,5 @@
 package com.reagan.shopIt.config.filter;
 
-import com.reagan.shopIt.model.exception.JwtAuthenticationException;
 import com.reagan.shopIt.model.exception.SetAuthenticationFailureException;
 import com.reagan.shopIt.config.security.jwt.JwtTokenProvider;
 import io.jsonwebtoken.JwtException;
@@ -11,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,20 +39,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-            String tokenHeader = request.getHeader("Authorization");
             String header = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        if (header == null || !StringUtils.startsWith(tokenHeader,"Bearer ")) {
+        if (header == null || !StringUtils.startsWith(header,"Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         String token = header.substring(7);
-        String username;
+        String username = null;
         try {
             username = tokenProvider.getUsernameFromToken(token);
         } catch (IllegalArgumentException | JwtException ex) {
-            throw new IllegalArgumentException("Invalid or expired token");
+            System.out.println(ex.getMessage());
         }
 
         if (StringUtils.isEmpty(username)) {

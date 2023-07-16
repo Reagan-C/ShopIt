@@ -39,10 +39,13 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         User user = userRepository.findByUsername(username);
         if (user!= null) {
             if (passwordEncoder.matches(password, user.getPassword())) {
+
+                if (user.getEnabled().equals(false)) {
+                    throw new IllegalArgumentException("Disabled account attempting log-in");
+                }
                 return new UsernamePasswordAuthenticationToken(username, password, getUserRoles(user.getRoles()));
-            } else {
-                throw new BadCredentialsException("Incorrect password");
             }
+                throw new BadCredentialsException("Incorrect password");
         }
         throw new BadCredentialsException("Username  incorrect");
     }

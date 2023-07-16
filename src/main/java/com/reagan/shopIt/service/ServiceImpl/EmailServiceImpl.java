@@ -33,13 +33,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendWelcomeMessage(String email) {
+    public void sendWelcomeMessage(String email, String name) {
         String content = " <div style=\"min-width:1000px;overflow:auto;line-height:2\">" +
                 " <div style=\"margin:50px auto;width:50%;padding:20px 0\">" +
                 "<div style=\"font-family:Helvetica,Arial,sans-serif;display:flex;border-bottom:1px solid #eee;" +
                 "font-size:1.2em;\"> <a href=\"\" style=\"margin-right: 5px;color: #00466a;text-decoration:none;" +
                 "font-weight:600\"><img style=\"height:55px; width:55px\" src=\"/\" /></a>" + "<p>ShopIt</p>" +
-                "</div>" + "<p style=\"font-size:1.1em\">" + "<b>Hello " + email + ",</b>" + "<br>" +
+                "</div>" + "<p style=\"font-size:1.1em\">" + "<b>Hello " + name + ",</b>" + "<br>" +
                 "Welcome to ShopIt." + "<br>" + "ShopIt is an E-commerce service where you shop for your needs." +
                 " All you need to do is to select what you want and we'll have it delivered to your doorstep.</p><br>" +
                 " <hr style=\"border:none;border-top:1px solid #eee\" />" +
