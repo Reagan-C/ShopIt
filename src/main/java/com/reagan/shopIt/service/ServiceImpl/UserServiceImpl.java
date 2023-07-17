@@ -161,15 +161,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<String> authenticate(SignInDTO body) {
+    public ResponseEntity<Map<String, Object>> authenticate(SignInDTO body) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(body.getEmailAddress(),
                     body.getPassword()));
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
-        String jwt =  tokenProvider.generateJwtToken(body.getEmailAddress());
-        return ResponseEntity.ok().body("Login successful " + jwt);
+        Map<String, Object> response = new HashMap<>();
+        response.put("token", tokenProvider.generateJwtToken(body.getEmailAddress()));
+        return ResponseEntity.ok(response);
     }
 
     @Override

@@ -18,7 +18,8 @@ public interface UserService {
     @Transactional
     ResponseEntity<String> confirmSignUpToken(UUID token);
 
-    ResponseEntity<String> authenticate(SignInDTO body);
+    @Transactional
+    ResponseEntity<Map<String, Object>> authenticate(SignInDTO body);
 
     ResponseEntity<?> signOut();
 

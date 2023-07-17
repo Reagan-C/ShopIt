@@ -39,7 +39,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         User user = userRepository.findByUsername(username);
         if (user!= null) {
             if (passwordEncoder.matches(password, user.getPassword())) {
-
                 if (user.getEnabled().equals(false)) {
                     throw new IllegalArgumentException("Disabled account attempting log-in");
                 }

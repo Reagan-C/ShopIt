@@ -5,6 +5,7 @@ import com.reagan.shopIt.model.domain.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class DTOTests {
     public void testUser() {
 
         Admin admin = new Admin(1L, 5L, "reaganchisom@gmail.com", "Reagan",
-                "Bill");
+                "Bill", new Date());
 
         assertThat(admin.getId()).isEqualTo(1L);
         assertThat(admin.getUserFirstName().equals("Reagan"));

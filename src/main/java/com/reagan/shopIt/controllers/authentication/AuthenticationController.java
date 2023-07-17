@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 @RestController
 @RequestMapping(value = "/auth", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -36,7 +36,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/log-in")
-    public ResponseEntity<String> signIn(@Validated @RequestBody SignInDTO body) {
+    public ResponseEntity<Map<String, Object>> signIn(@Validated @RequestBody SignInDTO body) {
         return userService.authenticate(body);
     }
 
