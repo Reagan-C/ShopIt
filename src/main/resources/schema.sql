@@ -6,7 +6,7 @@
         `user_email` VARCHAR(255),
         `user_first_name` VARCHAR(255),
         `user_last_name` VARCHAR(255),
-        `made_admin_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `made_admin_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
     );
 
@@ -26,8 +26,8 @@
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `category_name` VARCHAR(255) NOT NULL,
         `abbreviation` VARCHAR(255) NOT NULL,
-        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
         PRIMARY KEY (`id`)
     );
@@ -37,8 +37,8 @@
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `title` VARCHAR(255) NOT NULL,
         `abbreviation` VARCHAR(255) NOT NULL,
-        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
     );
 
@@ -46,7 +46,7 @@
     CREATE TABLE IF NOT EXISTS `fulfilled_orders` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `user_id` BIGINT,
-        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `confirmed_on` TIMESTAMP  DEFAULT NULL,
         `tracking_id` VARCHAR(255) NOT NULL,
         PRIMARY KEY (`id`)
@@ -61,8 +61,8 @@
         `quantity` INT NOT NULL,
         `picture` VARCHAR(255) NOT NULL,
         `category_id` BIGINT,
-        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `added_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
     );
 
@@ -71,9 +71,9 @@
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `token` VARCHAR(255) NOT NULL,
         `user_id` BIGINT,
-        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `confirmed_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        `expires_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `expires_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
         PRIMARY KEY (`id`)
     );
@@ -82,7 +82,7 @@
     CREATE TABLE IF NOT EXISTS `pending_order` (
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `confirmed` BOOLEAN NOT NULL DEFAULT FALSE,
-        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `updated_on` TIMESTAMP  DEFAULT NULL,
         `token` VARCHAR (255),
         `cost` DOUBLE NOT NULL,
@@ -95,8 +95,8 @@
         `id` BIGINT NOT NULL AUTO_INCREMENT,
         `code` VARCHAR(255) NOT NULL,
         `title` VARCHAR(255) NOT NULL,
-        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`id`)
     );
 
@@ -112,11 +112,11 @@
         `username` VARCHAR(255),
         `enabled` BOOLEAN NOT NULL DEFAULT FALSE,
         `city` VARCHAR(255),
-        `date_of_birth` date,
+        `date_of_birth` DATE,
         `password` VARCHAR(255),
         `authentication_token` VARCHAR(255),
-        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
-        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        `created_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        `updated_on` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
         `country_id` BIGINT,
 
         PRIMARY KEY (`id`)

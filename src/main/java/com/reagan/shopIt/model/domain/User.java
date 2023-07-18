@@ -53,7 +53,7 @@ public class User {
     @Column(name ="date_of_birth")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date dateOfBirth = new Date();
+    private Date dateOfBirth;
 
     @Column(name ="state")
     private String state;
