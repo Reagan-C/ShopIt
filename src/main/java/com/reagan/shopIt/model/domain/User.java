@@ -58,7 +58,7 @@ public class User {
     @Column(name ="state")
     private String state;
 
-@ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "country_id")
     private Country country;
 

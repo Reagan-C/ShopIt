@@ -4,24 +4,16 @@ import com.reagan.shopIt.model.exception.JwtAuthenticationException;
 import com.reagan.shopIt.util.JwtConfig;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 @Component
 public class JwtTokenProvider implements Serializable {
 
@@ -35,16 +27,18 @@ public class JwtTokenProvider implements Serializable {
         this.userDetailsService = userDetailsService;
     }
 
+    private SecretKey key() {
+        return Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
+    }
+
     public String generateJwtToken(String emailAddress) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(emailAddress);
         Date now = new Date(System.currentTimeMillis());
         Date expiryDate = new Date(System.currentTimeMillis() + jwtConfig.getExpiration() * 1000);
-        SecretKey key = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
+                .setSubject(emailAddress)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(key)
+                .signWith(key())
                 .compact();
     }
 
@@ -60,9 +54,9 @@ public class JwtTokenProvider implements Serializable {
     }
 
     public Boolean isTokenExpired(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
-        Claims claims = Jwts.parser()
-                .setSigningKey(key)
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -70,9 +64,9 @@ public class JwtTokenProvider implements Serializable {
     }
 
     public String getUsernameFromToken(String token) {
-        SecretKey key = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes(StandardCharsets.UTF_8));
-        return Jwts.parser()
-                .setSigningKey(key)
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
